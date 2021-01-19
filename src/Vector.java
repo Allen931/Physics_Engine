@@ -7,4 +7,8 @@ public class Vector {
         this.y = y;
     }
 
+    public double squareOfDistance(Vector target) {
+        return Math.pow(x - target.x, 2) + Math.pow(y - target.y, 2);
+    }
+
 }
