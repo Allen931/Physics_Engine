@@ -19,6 +19,14 @@ public class Vector {
         return new Vector(target.x + x, target.y + y);
     }
 
+    public Vector multiply(double coefficient) {
+        return new Vector(x * coefficient, y * coefficient);
+    }
+
+    public Vector multiply(int coefficient) {
+        return new Vector(x * coefficient, y * coefficient);
+    }
+
     public double dot_product(Vector target) {
         return x * target.x + y * target.y;
     }
