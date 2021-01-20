@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class PhysicsEngine {
-    private ArrayList<Body> bodies;
+    private final ArrayList<Body> bodies;
 
     public PhysicsEngine() {
         bodies = new ArrayList<>();
