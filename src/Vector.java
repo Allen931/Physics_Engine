@@ -1,6 +1,6 @@
-public class Vector {
-    double x;
-    double y;
+public class Vector implements Comparable<Vector> {
+    private double x;
+    private double y;
 
     public Vector(double x, double y) {
         this.x = x;
@@ -12,7 +12,7 @@ public class Vector {
     }
 
     public Vector subtract(Vector target) {
-        return new Vector(target.x - x, target.y - y);
+        return new Vector(x - target.x, y - target.y);
     }
 
     public Vector add(Vector target) {
@@ -36,9 +36,43 @@ public class Vector {
     }
 
     public void to_unit() {
-        double ratio = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-        x = x / ratio;
-        y = y / ratio;
+        double length = length();
+        x = x / length;
+        y = y / length;
     }
 
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double length() {
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    public double angle() {
+        return Math.atan(y / x);
+    }
+
+    @Override
+    public String toString() {
+        return "X :" + x + " Y :" + y;
+    }
+
+    @Override
+    public int compareTo(Vector o) {
+        if (angle() > o.angle()) {
+            return Double.compare(length(), o.length());
+        }
+        return Double.compare(length(), o.length());
+    }
+
+    public Vector unitNormalVector() {
+        Vector normal = new Vector(-y, x);
+        normal.to_unit();
+        return normal;
+    }
 }

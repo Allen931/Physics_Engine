@@ -1,11 +1,31 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class PhysicsEngine {
     private final ArrayList<Body> bodies;
+    private final double dt = 0.001;
 
     public PhysicsEngine() {
         bodies = new ArrayList<>();
+    }
+
+    public void update() {
+        handleCollisions();
+        updatePositions();
+        updateVelocities();
+    }
+
+    private void updatePositions() {
+        for (Body body : bodies) {
+            body.updatePosition(dt);
+        }
+    }
+
+    private void updateVelocities() {
+        for (Body body : bodies) {
+            body.updateVelocity(dt);
+        }
     }
 
     public void handleCollisions() {
@@ -43,12 +63,41 @@ public class PhysicsEngine {
 
         // Apply impulse
         Vector impulse = collision.collisionNormal.multiply(impulseScalar);
-        A.velocity.subtract(impulse.multiply(A.inverseMass));
-        B.velocity.add(impulse.multiply(B.inverseMass));
+        A.setVelocity(A.velocity.subtract(impulse.multiply(A.inverseMass)));
+        B.setVelocity(B.velocity.add(impulse.multiply(B.inverseMass)));
+        System.out.println("Relative velocity: " + relativeVelocity);
+        System.out.println("Normal: " + collision.collisionNormal);
+        System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);
+        System.out.println("B : Position: " + B.position + " " + "Velocity: " + B.velocity);
+    }
+
+//    private void applyImpulse() {
+//
+//    }
+
+    // prevent one body sinking into another
+    private void positionalCorrection(Body A, Body B, CollisionResolver.Collision collision) {
+        double percent = 0.2;
+        double slop = 0.01;
+        Vector correction = collision.collisionNormal.multiply(percent)
+                .multiply(Math.max(collision.penetrationDepth - slop, 0.0f))
+                .multiply((1 / (A.inverseMass + B.inverseMass)));
+        A.setPosition(A.position.subtract(correction.multiply(A.inverseMass)));
+        B.setPosition(B.position.add(correction.multiply(B.inverseMass)));
     }
 
     public void add(Body body) {
         bodies.add(body);
     }
 
+    public void addAll(List<Body> bodies) {
+        if (bodies == null || bodies.isEmpty()) {
+            return;
+        }
+        this.bodies.addAll(bodies);
+    }
+
+    public ArrayList<Body> getBodies() {
+        return bodies;
+    }
 }

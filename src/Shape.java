@@ -1,3 +1,4 @@
-public interface Shape {
+import java.awt.*;
 
+public interface Shape {
 }

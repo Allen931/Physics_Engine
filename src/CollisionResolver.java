@@ -10,6 +10,7 @@ public class CollisionResolver {
             bodyA = A;
             bodyB = B;
             this.collisionNormal = collisionNormal;
+            this.collisionNormal.to_unit();
             this.penetrationDepth = penetrationDepth;
             coefficientOfRestitution = Math.min(A.coefficientOfRestitution, B.coefficientOfRestitution);
         }
@@ -29,19 +30,19 @@ public class CollisionResolver {
     }
 
     private static Collision resolve(Body bodyA, Body bodyB, Circle circleA, Circle circleB) {
-        double penetration_depth = bodyA.center.squareOfDistance(bodyB.center)
-                - Math.pow(circleA.radius + circleB.radius, 2);
-        if (penetration_depth <= 0) {
-            Vector normal = bodyB.center.subtract(bodyA.center);
+        double penetration_depth = Math.pow(circleA.radius + circleB.radius, 2)
+                - bodyA.position.squareOfDistance(bodyB.position);
+        if (penetration_depth > 0) {
+            Vector normal = bodyB.position.subtract(bodyA.position);
             penetration_depth = Math.sqrt(penetration_depth);
             return new Collision(bodyA, bodyB, normal, penetration_depth);
         }
         return null;
     }
 
-//    private static Collision resolve(Body body_A, Body body_B, Polygon polygon_A, Polygon polygon_B) {
-//
-//    }
+    private static Collision resolve(Body body_A, Body body_B, Polygon polygon_A, Polygon polygon_B) {
+        return null;
+    }
 
 //    private static Collision resolve(Body body_A, Body body_B, Circle circle, Polygon polygon) {
 //
