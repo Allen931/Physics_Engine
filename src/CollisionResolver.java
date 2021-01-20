@@ -9,8 +9,7 @@ public class CollisionResolver {
         public Collision(Body A, Body B, Vector collisionNormal, double penetrationDepth) {
             bodyA = A;
             bodyB = B;
-            this.collisionNormal = collisionNormal;
-            this.collisionNormal.to_unit();
+            this.collisionNormal = collisionNormal.to_unit();
             this.penetrationDepth = penetrationDepth;
             coefficientOfRestitution = Math.min(A.coefficientOfRestitution, B.coefficientOfRestitution);
         }

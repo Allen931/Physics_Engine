@@ -1,6 +1,6 @@
 public class Vector implements Comparable<Vector> {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     public Vector(double x, double y) {
         this.x = x;
@@ -35,10 +35,9 @@ public class Vector implements Comparable<Vector> {
         return x * target.y - y * target.x;
     }
 
-    public void to_unit() {
+    public Vector to_unit() {
         double length = length();
-        x = x / length;
-        y = y / length;
+        return new Vector(x / length, y / length);
     }
 
     public double getX() {
@@ -71,8 +70,6 @@ public class Vector implements Comparable<Vector> {
     }
 
     public Vector unitNormalVector() {
-        Vector normal = new Vector(-y, x);
-        normal.to_unit();
-        return normal;
+        return new Vector(-y, x).to_unit();
     }
 }

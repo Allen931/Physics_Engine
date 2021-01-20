@@ -2,7 +2,7 @@ public class Body {
     Vector velocity = new Vector(0, 0);
     Vector acceleration = new Vector(0, 0);
     Vector position;
-    Shape shape;
+    final Shape shape;
     double mass;
     double inverseMass;
     double coefficientOfRestitution;
