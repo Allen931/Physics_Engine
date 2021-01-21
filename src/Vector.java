@@ -35,6 +35,10 @@ public class Vector implements Comparable<Vector> {
         return x * target.y - y * target.x;
     }
 
+    public Vector negative() {
+        return new Vector(-x, -y);
+    }
+
     public Vector to_unit() {
         double length = length();
         return new Vector(x / length, y / length);
@@ -64,9 +68,12 @@ public class Vector implements Comparable<Vector> {
     @Override
     public int compareTo(Vector o) {
         if (angle() > o.angle()) {
+            return -1;
+        } else if (angle() == o.angle()) {
             return Double.compare(length(), o.length());
+        } else {
+            return 1;
         }
-        return Double.compare(length(), o.length());
     }
 
     public Vector unitNormalVector() {
