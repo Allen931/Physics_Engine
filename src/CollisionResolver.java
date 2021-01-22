@@ -121,7 +121,6 @@ public class CollisionResolver {
         return collision;
     }
 
-    // TODO
     private static Collision resolve(Body bodyPolygon, Body bodyCircle, Polygon polygon, Circle circle) {
         return resolve(bodyCircle, bodyPolygon, circle, polygon);
     }
