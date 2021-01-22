@@ -13,4 +13,9 @@ public class Circle implements Shape{
     public double getArea() {
         return Math.PI * radius * radius;
     }
+
+    @Override
+    public double getMomentOfInertiaFactor() {
+        return Math.pow(radius, 4) * Math.PI / 4;
+    }
 }

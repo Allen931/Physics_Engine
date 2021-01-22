@@ -11,8 +11,10 @@ public class Body {
 
     // angle in radian
     double orientation;
+    double angularVelocity;
+    double momentOfInertia;
+    double inverseMomentOfInertia;
     Matrix rotationMatrix;
-
 
     public Body(Vector position, Shape shape, Material material) {
         this.position = position;
@@ -20,12 +22,17 @@ public class Body {
         this.material = material;
         this.mass = material.getDensity() * shape.getArea();
         inverseMass = mass == 0 ? 0 : 1 / mass;
-        orientation = 0;
-        rotationMatrix = new Matrix(orientation);
+        setOrientation(0);
+        angularVelocity = 0;
+        momentOfInertia = shape.getMomentOfInertiaFactor() * material.getDensity();
+        inverseMomentOfInertia = momentOfInertia == 0 ? 0 : 1 / momentOfInertia;
     }
 
     public void updatePosition(double dt) {
-        position = position.add(velocity.multiply(dt));
+        if (mass != 0) {
+            position = position.add(velocity.multiply(dt));
+            setOrientation(orientation + angularVelocity * dt);
+        }
     }
 
     public void updateVelocity(double dt) {
@@ -44,6 +51,15 @@ public class Body {
         this.acceleration = acceleration;
     }
 
+    public void resetAcceleration() {
+        acceleration = new Vector(0, 0);
+    }
+
+    public void applyImpulse(Vector impulse, Vector contactVector) {
+        velocity = velocity.multiply(inverseMass);
+        angularVelocity += contactVector.crossProduct2D(impulse) * inverseMomentOfInertia;
+    }
+
     public Shape getShape() {
         return shape;
     }
@@ -54,10 +70,16 @@ public class Body {
 
     /**
      * rotate the body
+     *
      * @param angle in radian
      */
     public void rotate(double angle) {
         orientation += angle;
+        rotationMatrix = new Matrix(orientation);
+    }
+
+    public void setOrientation(double angle) {
+        orientation = angle;
         rotationMatrix = new Matrix(orientation);
     }
 

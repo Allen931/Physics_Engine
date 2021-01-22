@@ -47,34 +47,34 @@ public class PhysicsEngine {
     }
 
     private void handleCollision(Collision collision) {
-        Body A = collision.bodyA;
-        Body B = collision.bodyB;
+        for (Vector contactPoint : collision.contactPoints) {
+            Body A = collision.bodyA;
+            Body B = collision.bodyB;
 
-        // Calculate relative velocity
-        Vector relativeVelocity = B.velocity.subtract(A.velocity);
-        double velocityAlongNormal = relativeVelocity.dotProduct(collision.collisionNormal);
-        if (velocityAlongNormal > 0) {
-            return;
+            // Calculate relative velocity
+            Vector relativeVelocity = B.velocity.subtract(A.velocity);
+            double velocityAlongNormal = relativeVelocity.dotProduct(collision.collisionNormal);
+            if (velocityAlongNormal > 0) {
+                return;
+            }
+
+            // Calculate impulse scalar
+            double impulseScalar = -(1 + collision.coefficientOfRestitution) * velocityAlongNormal;
+            impulseScalar /= A.inverseMass + B.inverseMass;
+
+            // Apply impulse
+            Vector impulse = collision.collisionNormal.multiply(impulseScalar);
+            A.setVelocity(A.velocity.subtract(impulse.multiply(A.inverseMass)));
+            B.setVelocity(B.velocity.add(impulse.multiply(B.inverseMass)));
+            positionalCorrection(A, B, collision);
+
+
+            System.out.println("Relative velocity: " + relativeVelocity);
+            System.out.println("Normal: " + collision.collisionNormal);
+            System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);
+            System.out.println("B : Position: " + B.position + " " + "Velocity: " + B.velocity);
         }
-
-        // Calculate impulse scalar
-        double impulseScalar = -(1 + collision.coefficientOfRestitution) * velocityAlongNormal;
-        impulseScalar /= A.inverseMass + B.inverseMass;
-
-        // Apply impulse
-        Vector impulse = collision.collisionNormal.multiply(impulseScalar);
-        A.setVelocity(A.velocity.subtract(impulse.multiply(A.inverseMass)));
-        B.setVelocity(B.velocity.add(impulse.multiply(B.inverseMass)));
-        positionalCorrection(A, B, collision);
-        System.out.println("Relative velocity: " + relativeVelocity);
-        System.out.println("Normal: " + collision.collisionNormal);
-        System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);
-        System.out.println("B : Position: " + B.position + " " + "Velocity: " + B.velocity);
     }
-
-//    private void applyImpulse() {
-//
-//    }
 
     // prevent one body sinking into another
     private void positionalCorrection(Body A, Body B, Collision collision) {

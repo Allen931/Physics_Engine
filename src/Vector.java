@@ -23,8 +23,8 @@ public class Vector implements Comparable<Vector> {
         return new Vector(x * coefficient, y * coefficient);
     }
 
-    public Vector multiply(int coefficient) {
-        return new Vector(x * coefficient, y * coefficient);
+    public Vector divideBy(double divisor) {
+        return new Vector(x / divisor, y / divisor);
     }
 
     public double dotProduct(Vector target) {
