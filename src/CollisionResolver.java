@@ -1,34 +1,10 @@
-import java.util.ArrayList;
-
 public class CollisionResolver {
-
-    public static class Collision {
-        Body bodyA, bodyB;
-        Vector collisionNormal;
-        double penetrationDepth;
-        double coefficientOfRestitution;
-        ArrayList<Vector> contactPoints = new ArrayList<>();
-
-//        Side referenceSide, incidentSide;
-
-        public Collision(Body A, Body B, Vector collisionNormal, double penetrationDepth) {
-            bodyA = A;
-            bodyB = B;
-            this.collisionNormal = collisionNormal.to_unit();
-            this.penetrationDepth = penetrationDepth;
-            coefficientOfRestitution = Math.min(A.coefficientOfRestitution, B.coefficientOfRestitution);
-        }
-
-        public void addContactPoint(Vector contactPoint) {
-            contactPoints.add(contactPoint);
-        }
-    }
 
     public static Collision resolve(Body A, Body B) {
         if (A.getShape() instanceof Circle && B.getShape() instanceof Circle) {
             return resolve(A, B, (Circle) A.getShape(), (Circle) B.getShape());
-//        } else if (A.shape instanceof Polygon && B.shape instanceof Polygon) {
-//            return resolve(A, B, (Polygon) A.shape, (Polygon) B.shape);
+        } else if (A.getShape() instanceof Polygon && B.getShape() instanceof Polygon) {
+            return resolve(A, B, (Polygon) A.getShape(), (Polygon) B.getShape());
 //        } else if (A.shape instanceof Circle && B.shape instanceof Polygon) {
 //            return resolve(A, B, (Circle) A.shape, (Polygon) B.shape);
 //        } else if (A.shape instanceof Polygon && B.shape instanceof Circle) {
@@ -51,31 +27,74 @@ public class CollisionResolver {
         return null;
     }
 
-    private static Collision resolve(Body body_A, Body body_B, Polygon polygon_A, Polygon polygon_B) {
-        return null;
+    private static Collision resolve(Body bodyA, Body bodyB, Polygon polygonA, Polygon polygonB) {
+        LeastPenetration axisLeastPenetrationReferenceA = findLeastPenetrationPolygon(bodyA, bodyB);
+        if (axisLeastPenetrationReferenceA.separation > 0) {
+            return null;
+        }
+        LeastPenetration axisLeastPenetrationReferenceB = findLeastPenetrationPolygon(bodyB, bodyA);
+        if (axisLeastPenetrationReferenceB.separation > 0) {
+            return null;
+        }
+
+        Side referenceSide;
+        Body referenceBody, incidentBody;
+        Polygon referencePolygon, incidentPolygon;
+        // separation is a negative value
+        if (axisLeastPenetrationReferenceA.separation > axisLeastPenetrationReferenceB.separation) {
+            referenceBody = bodyA;
+            incidentBody = bodyB;
+            referenceSide = axisLeastPenetrationReferenceA.referenceSide;
+        } else {
+            referenceBody = bodyB;
+            incidentBody = bodyA;
+            referenceSide = axisLeastPenetrationReferenceB.referenceSide;
+        }
+        referencePolygon = (Polygon) referenceBody.getShape();
+        incidentPolygon = (Polygon) incidentBody.getShape();
+
+
+
+
+
+
     }
 
-//    private static Collision resolve(Body body_A, Body body_B, Circle circle, Polygon polygon) {
-//
-//    }
-//
-//    private static Collision resolve(Body body_A, Body body_B, Polygon polygon, Circle circle) {
+    private static Collision resolve(Body bodyCircle, Body bodyPolygon, Circle circle, Polygon polygon) {
+        LeastPenetration axisLeastPenetration = findLeastPenetrationCircle(bodyPolygon, bodyCircle);
+        double separation = axisLeastPenetration.separation;
+        if (separation > circle.getRadius()) {
+            return null;
+        }
+
+        Side referenceSide = axisLeastPenetration.referenceSide;
+        Vector collisionNormal, contactPoint;
+
+        if (separation < 0) {
+            collisionNormal = bodyPolygon.toWorldCoordinates(referenceSide).getNormal().reverse();
+            contactPoint = collisionNormal.multiply(circle.getRadius()).add(bodyCircle.position);
+        }
+
+
+    }
+
+//    private static Collision resolve(Body bodyA, Body bodyB, Polygon polygon, Circle circle) {
 //
 //    }
 
     /**
      * Get the farthest point from the side
-     * @param target target polygon
+     * @param incidentBody incident polygon
      * @param direction should be in world coordinates
      * @return the farthest point
      */
-    public static Vector getSupportPoint(Body target, Vector direction) {
-        Polygon polygon = (Polygon) target.getShape();
+    public static Vector getSupportPoint(Body incidentBody, Vector direction) {
+        Polygon incidentPolygon = (Polygon) incidentBody.getShape();
         double largestProjection = -Double.MAX_VALUE;
         Vector supportPoint = null;
-        for (Vector vertex : polygon.getVertices()) {
-            vertex = target.toWorldCoordinates(vertex);
-            double projection = vertex.dot_product(direction);
+        for (Vector vertex : incidentPolygon.getVertices()) {
+            vertex = incidentBody.toWorldCoordinates(vertex);
+            double projection = vertex.dotProduct(direction);
 
             if (projection > largestProjection) {
                 largestProjection = projection;
@@ -86,41 +105,64 @@ public class CollisionResolver {
     }
 
     /**
-     * Find the Axis Least Penetration
-     * @param polygonA reference polygon
-     * @param polygonB collides with A
+     * Find the Least Penetration
+     * @param referencePolygon reference Polygon
+     * @param incidentPolygon collides with referencePolygon
      * @return AxisLeastPenetration with the side and the distance
      */
-    public static AxisLeastPenetration findAxisLeastPenetration(Body polygonA, Body polygonB) {
-        Side[] sides = ((Polygon) polygonA.getShape()).getSides();
+    public static LeastPenetration findLeastPenetrationPolygon(Body referencePolygon, Body incidentPolygon) {
+        Side[] sides = ((Polygon) referencePolygon.getShape()).getSides();
 
-        // if penetration, bestDistance should be a negative value
+        // if penetration, bestSeparation should be a negative value
         // the maximum of negative values should be a value with minimum absolute value
-        double bestDistance = -Double.MAX_VALUE;
-        // bestSide is a side of A
-        Side bestSide = null;
+        double bestSeparation = -Double.MAX_VALUE;
+        Side referenceSide = null;
         for (Side side : sides) {
-            Vector supportPoint = CollisionResolver.getSupportPoint(polygonB,
-                    polygonA.toWorldCoordinates(side).getNormal().negative());
-            double distance = polygonA.toWorldCoordinates(side).distanceToSide(supportPoint);
+            Vector supportPoint = getSupportPoint(incidentPolygon,
+                    referencePolygon.toWorldCoordinates(side).getNormal().reverse());
+            double separation = referencePolygon.toWorldCoordinates(side).distanceToSide(supportPoint);
 
-            if (distance > bestDistance) {
-                bestDistance = distance;
-                bestSide = side;
+            if (separation > bestSeparation) {
+                bestSeparation = separation;
+                referenceSide = side;
             }
         }
-        return new AxisLeastPenetration(bestSide, bestDistance);
+        return new LeastPenetration(referenceSide, bestSeparation);
     }
 
-    public static class AxisLeastPenetration {
-        Side side;
+    public static LeastPenetration findLeastPenetrationCircle(Body referencePolygon, Body incidentCircle) {
+        Side[] sides = ((Polygon) referencePolygon.getShape()).getSides();
+        Vector center = referencePolygon.toBodyCoordinates(incidentCircle.position);
+
+        double bestSeparation = -Double.MAX_VALUE;
+        Side referenceSide = null;
+
+        for (Side side : sides) {
+            double separation = side.distanceToSide(center);
+
+            if (separation > bestSeparation) {
+                bestSeparation = separation;
+                referenceSide = side;
+            }
+        }
+        return new LeastPenetration(referenceSide, bestSeparation);
+    }
+
+    public static class LeastPenetration {
+        // in body coordinates
+        Side referenceSide;
         // penetration = -separation
         double separation;
 
-        public AxisLeastPenetration(Side side, double separation) {
-            this.side = side;
+        public LeastPenetration(Side referenceSide, double separation) {
+            this.referenceSide = referenceSide;
             this.separation = separation;
         }
+
+        public double getPenetration() {
+            return -separation;
+        }
+
     }
 
     /**
@@ -131,7 +173,7 @@ public class CollisionResolver {
      * @param referenceSide reference side in reference body coordinates
      * @return incident side which is in incident body coordinates
      */
-    public static Side findIncidentSide(Side referenceSide, Body referenceBody, Body incidentBody) {
+    private static Side findIncidentSide(Side referenceSide, Body referenceBody, Body incidentBody) {
         Polygon incidentPolygon = (Polygon) incidentBody.getShape();
         referenceSide = referenceBody.toWorldCoordinates(referenceSide);
         Vector referenceSideNormal = referenceSide.getNormal();
@@ -141,7 +183,7 @@ public class CollisionResolver {
 
         for (Side side : incidentPolygon.getSides()) {
             double dotProductOfNormals =
-                    incidentBody.toWorldCoordinates(side.getNormal()).dot_product(referenceSideNormal);
+                    incidentBody.toWorldCoordinates(side.getNormal()).dotProduct(referenceSideNormal);
             if (dotProductOfNormals < smallestDotProductOfNormals) {
                 smallestDotProductOfNormals = dotProductOfNormals;
                 incidentSide = side;
@@ -155,11 +197,11 @@ public class CollisionResolver {
      * All parameters should be in world coordinates
      * @return a modified incident side
      */
-    public static Side clip(Side incidentSide, Vector vertexOnReferenceSide, Vector directionPointToVertex) {
+    private static Side clip(Side incidentSide, Vector vertexOnReferenceSide, Vector directionPointToVertex) {
         double distanceFromVertexToA =
-                directionPointToVertex.dot_product(incidentSide.getA().subtract(vertexOnReferenceSide));
+                directionPointToVertex.dotProduct(incidentSide.getA().subtract(vertexOnReferenceSide));
         double distanceFromVertexToB =
-                directionPointToVertex.dot_product(incidentSide.getB().subtract(vertexOnReferenceSide));
+                directionPointToVertex.dotProduct(incidentSide.getB().subtract(vertexOnReferenceSide));
 
         // if A is negative, B is positive, A - B is negative, and ratio is positive
         // if A is positive, B is negative, A - B is positive, and ratio is positive

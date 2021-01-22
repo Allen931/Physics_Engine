@@ -29,30 +29,30 @@ public class PhysicsEngine {
     }
 
     public void handleCollisions() {
-        LinkedList<CollisionResolver.Collision> collisions = new LinkedList<>();
+        LinkedList<Collision> collisions = new LinkedList<>();
         for (int i = 0; i < bodies.size(); i++) {
             Body bodyA = bodies.get(i);
             for (int j = i + 1; j < bodies.size(); j++) {
                 Body bodyB = bodies.get(j);
-                CollisionResolver.Collision collision = CollisionResolver.resolve(bodyA, bodyB);
+                Collision collision = CollisionResolver.resolve(bodyA, bodyB);
                 if (collision != null) {
                     collisions.add(collision);
                 }
             }
         }
 
-        for (CollisionResolver.Collision collision : collisions) {
+        for (Collision collision : collisions) {
             handleCollision(collision);
         }
     }
 
-    private void handleCollision(CollisionResolver.Collision collision) {
+    private void handleCollision(Collision collision) {
         Body A = collision.bodyA;
         Body B = collision.bodyB;
 
         // Calculate relative velocity
         Vector relativeVelocity = B.velocity.subtract(A.velocity);
-        double velocityAlongNormal = relativeVelocity.dot_product(collision.collisionNormal);
+        double velocityAlongNormal = relativeVelocity.dotProduct(collision.collisionNormal);
         if (velocityAlongNormal > 0) {
             return;
         }
@@ -76,7 +76,7 @@ public class PhysicsEngine {
 //    }
 
     // prevent one body sinking into another
-    private void positionalCorrection(Body A, Body B, CollisionResolver.Collision collision) {
+    private void positionalCorrection(Body A, Body B, Collision collision) {
         double percent = 0.2;
         double slop = 0.01;
         Vector correction = collision.collisionNormal.multiply(percent)

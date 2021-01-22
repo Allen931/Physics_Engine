@@ -27,19 +27,19 @@ public class Vector implements Comparable<Vector> {
         return new Vector(x * coefficient, y * coefficient);
     }
 
-    public double dot_product(Vector target) {
+    public double dotProduct(Vector target) {
         return x * target.x + y * target.y;
     }
 
-    public double cross_product_2D(Vector target) {
+    public double crossProduct2D(Vector target) {
         return x * target.y - y * target.x;
     }
 
-    public Vector negative() {
+    public Vector reverse() {
         return new Vector(-x, -y);
     }
 
-    public Vector to_unit() {
+    public Vector toUnitVector() {
         double length = length();
         return new Vector(x / length, y / length);
     }
@@ -77,6 +77,6 @@ public class Vector implements Comparable<Vector> {
     }
 
     public Vector unitNormalVector() {
-        return new Vector(y, -x).to_unit();
+        return new Vector(y, -x).toUnitVector();
     }
 }

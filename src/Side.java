@@ -2,18 +2,20 @@ public class Side {
     private final Vector A;
     private final Vector B;
     private final Vector normal;
-    private final Vector direction;
 
     // Side AB
     public Side(Vector A, Vector B) {
         this.A = A;
         this.B = B;
         this.normal = B.subtract(A).unitNormalVector();
-        this.direction = B.subtract(A).to_unit();
+    }
+
+    public Vector toVectorForm() {
+        return B.subtract(A);
     }
 
     public Vector getDirection() {
-        return direction;
+        return B.subtract(A).toUnitVector();
     }
 
     public Vector getNormal() {
@@ -38,7 +40,7 @@ public class Side {
      */
     public double distanceToSide(Vector target) {
         Vector vertexToTarget = target.subtract(A);
-        return vertexToTarget.dot_product(normal);
+        return vertexToTarget.dotProduct(normal);
     }
 
     public Side changeA(Vector changedA) {

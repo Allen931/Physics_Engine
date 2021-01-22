@@ -3,21 +3,21 @@ public class Body {
     Vector acceleration = new Vector(0, 0);
     Vector position;
     private final Shape shape;
+    private final Material material;
     double mass;
     double inverseMass;
-    double coefficientOfRestitution;
 
     // angle in radian
     double orientation;
     Matrix rotationMatrix;
 
 
-    public Body(Vector position, Shape shape, double mass, double coefficientOfRestitution) {
+    public Body(Vector position, Shape shape, Material material) {
         this.position = position;
         this.shape = shape;
-        this.mass = mass;
+        this.material = material;
+        this.mass = material.getDensity() * shape.getArea();
         inverseMass = mass == 0 ? 0 : 1 / mass;
-        this.coefficientOfRestitution = coefficientOfRestitution;
         orientation = 0;
         rotationMatrix = new Matrix(orientation);
     }
@@ -71,12 +71,12 @@ public class Body {
         return side.toBodyCoordinates(rotationMatrix, position);
     }
 
-    public static Body createCircle(double x, double y, double radius, double mass, double coefficientOfRestitution) {
-        return new Body(new Vector(x, y), new Circle(radius), mass, coefficientOfRestitution);
+    public static Body createCircle(double x, double y, double radius, Material material) {
+        return new Body(new Vector(x, y), new Circle(radius), material);
     }
 
-    public static Body createPolygon(double x, double y, Vector[] vertices, double mass, double coefficientOfRestitution) {
-        return new Body(new Vector(x, y), new Polygon(vertices), mass, coefficientOfRestitution);
+    public static Body createPolygon(double x, double y, Vector[] vertices, Material material) {
+        return new Body(new Vector(x, y), new Polygon(vertices), material);
     }
 
 }
