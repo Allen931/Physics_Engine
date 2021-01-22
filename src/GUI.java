@@ -28,8 +28,8 @@ public class GUI extends JFrame {
             setBackground(Color.white);
             timer = new Timer(20, this);
             timer.start();
-            Body A = Body.createCircle(200, 250, 20, 20, 1);
-            Body B = Body.createCircle(600, 250, 20, 20, 1);
+            Body A = Body.createCircle(200, 100, 20, 20, 1);
+            Body B = Body.createCircle(600, 100, 20, 20, 1);
             A.setVelocity(new Vector(50, 0));
             B.setVelocity(new Vector(-50, 0));
             A.setAcceleration(new Vector(0, 9.8));
@@ -46,18 +46,18 @@ public class GUI extends JFrame {
 
         private void drawBodies(Graphics graphics) {
             for (Body body : physicsEngine.getBodies()) {
-                if (body.shape instanceof Circle) {
+                if (body.getShape() instanceof Circle) {
                     drawCircle(graphics, body);
                 }
             }
         }
 
         private void drawCircle(Graphics graphics, Body body) {
-            Circle circle = (Circle) body.shape;
-            graphics.drawOval((int) Math.round(body.position.getX() - circle.radius),
-                    (int) Math.round(body.position.getY() - circle.radius),
-                    (int) Math.round(circle.radius * 2),
-                    (int) Math.round(circle.radius * 2));
+            Circle circle = (Circle) body.getShape();
+            graphics.drawOval((int) Math.round(body.position.getX() - circle.getRadius()),
+                    (int) Math.round(body.position.getY() - circle.getRadius()),
+                    (int) Math.round(circle.getRadius() * 2),
+                    (int) Math.round(circle.getRadius() * 2));
         }
 
         @Override

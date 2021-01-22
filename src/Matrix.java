@@ -13,6 +13,7 @@ public class Matrix {
         this.columnVector1 = columnVector1;
     }
 
+    // rotation matrix
     public Matrix(double angle) {
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);
@@ -33,7 +34,7 @@ public class Matrix {
         return new Vector(v0.getX() + v1.getX(), v0.getY() + v1.getY());
     }
 
-    public Matrix transform(Matrix matrix) {
+    public Matrix matrixMultiplication(Matrix matrix) {
         Vector v0 = transform(matrix.columnVector0);
         Vector v1 = transform(matrix.columnVector1);
         return new Matrix(v0, v1);

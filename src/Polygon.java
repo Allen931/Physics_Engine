@@ -1,68 +1,32 @@
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class Polygon implements Shape{
-    Vector[] vertices;
-    Plane[] planes;
+    private final Vector[] vertices;
+    private final Side[] sides;
 
     public Polygon(Vector[] vertices) {
         this.vertices = vertices;
-        planes = new Plane[vertices.length];
+        sides = new Side[vertices.length];
         sortVertices();
-        initializeNormals();
+        initializeSides();
     }
 
     private void sortVertices() {
         Arrays.sort(vertices);
     }
 
-    private void initializeNormals() {
+    private void initializeSides() {
         for (int i = 0; i < vertices.length - 1; i++) {
-            Vector normal = vertices[i + 1].subtract(vertices[i]).unitNormalVector();
-            planes[i] = new Plane(vertices[i], vertices[i + 1], normal);
+            sides[i] = new Side(vertices[i], vertices[i + 1]);
         }
-        Vector normal = vertices[0].subtract(vertices[vertices.length - 1]).unitNormalVector();
-        planes[vertices.length - 1] = new Plane(vertices[vertices.length - 1], vertices[0], normal);
+        sides[vertices.length - 1] = new Side(vertices[vertices.length - 1], vertices[0]);
     }
 
-    public Vector getSupportPoint(Vector direction) {
-        double largestProjection = -Double.MAX_VALUE;
-        Vector supportPoint = null;
-        for (Vector vertex : vertices) {
-            double projection = vertex.dot_product(direction);
-
-            if (projection > largestProjection) {
-                largestProjection = projection;
-                supportPoint = vertex;
-            }
-        }
-        return supportPoint;
+    public Vector[] getVertices() {
+        return vertices;
     }
 
-    public AxisLeastPenetration FindAxisLeastPenetration(Polygon target) {
-        double bestDistance = -Double.MAX_VALUE;
-        Plane bestPlane = null;
-        for (Plane plane : planes) {
-            Vector supportPoint = target.getSupportPoint(plane.normal.negative());
-            double distance = plane.distanceToPlane(supportPoint);
-
-            if (distance > bestDistance) {
-                bestDistance = distance;
-                bestPlane = plane;
-            }
-        }
-        return new AxisLeastPenetration(bestPlane, bestDistance);
+    public Side[] getSides() {
+        return sides;
     }
-
-    public static class AxisLeastPenetration {
-        Plane plane;
-        double distance;
-
-        public AxisLeastPenetration(Plane plane, double distance) {
-            this.plane = plane;
-            this.distance = distance;
-        }
-    }
-
-
 }

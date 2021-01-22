@@ -57,7 +57,7 @@ public class Vector implements Comparable<Vector> {
     }
 
     public double angle() {
-        return Math.atan(y / x);
+        return Math.atan2(y, x);
     }
 
     @Override
@@ -68,15 +68,15 @@ public class Vector implements Comparable<Vector> {
     @Override
     public int compareTo(Vector o) {
         if (angle() > o.angle()) {
-            return -1;
-        } else if (angle() == o.angle()) {
-            return Double.compare(length(), o.length());
-        } else {
             return 1;
+        } else if (angle() == o.angle()) {
+            return -Double.compare(length(), o.length());
+        } else {
+            return -1;
         }
     }
 
     public Vector unitNormalVector() {
-        return new Vector(-y, x).to_unit();
+        return new Vector(y, -x).to_unit();
     }
 }

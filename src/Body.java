@@ -2,13 +2,14 @@ public class Body {
     Vector velocity = new Vector(0, 0);
     Vector acceleration = new Vector(0, 0);
     Vector position;
-    final Shape shape;
+    private final Shape shape;
     double mass;
     double inverseMass;
     double coefficientOfRestitution;
 
     // angle in radian
     double orientation;
+    Matrix rotationMatrix;
 
 
     public Body(Vector position, Shape shape, double mass, double coefficientOfRestitution) {
@@ -17,6 +18,8 @@ public class Body {
         this.mass = mass;
         inverseMass = mass == 0 ? 0 : 1 / mass;
         this.coefficientOfRestitution = coefficientOfRestitution;
+        orientation = 0;
+        rotationMatrix = new Matrix(orientation);
     }
 
     public void updatePosition(double dt) {
@@ -37,6 +40,35 @@ public class Body {
 
     public void setAcceleration(Vector acceleration) {
         this.acceleration = acceleration;
+    }
+
+    public Shape getShape() {
+        return shape;
+    }
+
+    /**
+     * rotate the body
+     * @param angle in radian
+     */
+    public void rotate(double angle) {
+        orientation += angle;
+        rotationMatrix = new Matrix(orientation);
+    }
+
+    public Vector toWorldCoordinates(Vector vector) {
+        return rotationMatrix.transform(vector).add(position);
+    }
+
+    public Side toWorldCoordinates(Side side) {
+        return side.toWorldCoordinates(rotationMatrix, position);
+    }
+
+    public Vector toBodyCoordinates(Vector vector) {
+        return rotationMatrix.transpose().transform(vector).subtract(position);
+    }
+
+    public Side toBodyCoordinates(Side side) {
+        return side.toBodyCoordinates(rotationMatrix, position);
     }
 
     public static Body createCircle(double x, double y, double radius, double mass, double coefficientOfRestitution) {
