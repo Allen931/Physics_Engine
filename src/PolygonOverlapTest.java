@@ -12,9 +12,9 @@ public class PolygonOverlapTest {
 
         Polygon A = (Polygon) polygonA.getShape();
         Polygon B = (Polygon) polygonB.getShape();
-        System.out.println(CollisionResolver.findLeastPenetrationPolygon(polygonA, polygonB).separation);
+        System.out.println(CollisionDetector.findLeastPenetrationPolygon(polygonA, polygonB).separation);
 
-        Assert.assertTrue(CollisionResolver.findLeastPenetrationPolygon(polygonA, polygonB).separation < 0);
+        Assert.assertTrue(CollisionDetector.findLeastPenetrationPolygon(polygonA, polygonB).separation < 0);
     }
 
     @Test
@@ -30,9 +30,9 @@ public class PolygonOverlapTest {
 
         Polygon A = (Polygon) polygonA.getShape();
         Polygon B = (Polygon) polygonB.getShape();
-        System.out.println(CollisionResolver.findLeastPenetrationPolygon(polygonA, polygonB).separation);
+        System.out.println(CollisionDetector.findLeastPenetrationPolygon(polygonA, polygonB).separation);
 
-        Assert.assertTrue(CollisionResolver.findLeastPenetrationPolygon(polygonA, polygonB).separation < 0);
+        Assert.assertTrue(CollisionDetector.findLeastPenetrationPolygon(polygonA, polygonB).separation < 0);
     }
 
 }

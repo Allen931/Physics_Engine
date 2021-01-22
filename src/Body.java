@@ -1,3 +1,5 @@
+import static java.lang.Math.PI;
+
 public class Body {
     Vector velocity = new Vector(0, 0);
     Vector acceleration = new Vector(0, 0);
@@ -73,6 +75,12 @@ public class Body {
 
     public Side toBodyCoordinates(Side side) {
         return side.toBodyCoordinates(rotationMatrix, position);
+    }
+
+    public Vector toUICoordinates(Vector vector) {
+        // round orientation to nearest integer in degree
+        Matrix uiRotationMatrix = new Matrix(Math.round(orientation / PI * 180) / 180 * PI);
+        return uiRotationMatrix.transform(vector).add(position);
     }
 
     public static Body createCircle(double x, double y, double radius, Material material) {

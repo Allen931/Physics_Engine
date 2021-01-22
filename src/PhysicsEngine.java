@@ -34,7 +34,7 @@ public class PhysicsEngine {
             Body bodyA = bodies.get(i);
             for (int j = i + 1; j < bodies.size(); j++) {
                 Body bodyB = bodies.get(j);
-                Collision collision = CollisionResolver.resolve(bodyA, bodyB);
+                Collision collision = CollisionDetector.detect(bodyA, bodyB);
                 if (collision != null) {
                     collisions.add(collision);
                 }
@@ -65,6 +65,7 @@ public class PhysicsEngine {
         Vector impulse = collision.collisionNormal.multiply(impulseScalar);
         A.setVelocity(A.velocity.subtract(impulse.multiply(A.inverseMass)));
         B.setVelocity(B.velocity.add(impulse.multiply(B.inverseMass)));
+        positionalCorrection(A, B, collision);
         System.out.println("Relative velocity: " + relativeVelocity);
         System.out.println("Normal: " + collision.collisionNormal);
         System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);

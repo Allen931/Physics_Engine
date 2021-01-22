@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class Collision {
     Body bodyA, bodyB;
@@ -8,8 +9,6 @@ public class Collision {
     double penetrationDepth;
     double coefficientOfRestitution;
     ArrayList<Vector> contactPoints = new ArrayList<>();
-
-//        Side referenceSide, incidentSide;
 
     public Collision(Body A, Body B, Vector collisionNormal, double penetrationDepth) {
         bodyA = A;
@@ -22,5 +21,9 @@ public class Collision {
 
     public void addContactPoint(Vector contactPoint) {
         contactPoints.add(contactPoint);
+    }
+
+    public void addContactPoints(List<Vector> contactPoints) {
+        this.contactPoints.addAll(contactPoints);
     }
 }

@@ -1,19 +1,21 @@
-public class CollisionResolver {
+import java.util.ArrayList;
 
-    public static Collision resolve(Body A, Body B) {
+public class CollisionDetector {
+
+    public static Collision detect(Body A, Body B) {
         if (A.getShape() instanceof Circle && B.getShape() instanceof Circle) {
-            return resolve(A, B, (Circle) A.getShape(), (Circle) B.getShape());
+            return detect(A, B, (Circle) A.getShape(), (Circle) B.getShape());
         } else if (A.getShape() instanceof Polygon && B.getShape() instanceof Polygon) {
-            return resolve(A, B, (Polygon) A.getShape(), (Polygon) B.getShape());
+            return detect(A, B, (Polygon) A.getShape(), (Polygon) B.getShape());
         } else if (A.getShape() instanceof Circle && B.getShape() instanceof Polygon) {
-            return resolve(A, B, (Circle) A.getShape(), (Polygon) B.getShape());
+            return detect(A, B, (Circle) A.getShape(), (Polygon) B.getShape());
         } else if (A.getShape() instanceof Polygon && B.getShape() instanceof Circle) {
-            return resolve(A, B, (Polygon) A.getShape(), (Circle) B.getShape());
+            return detect(A, B, (Polygon) A.getShape(), (Circle) B.getShape());
         }
         return null;
     }
 
-    private static Collision resolve(Body bodyA, Body bodyB, Circle circleA, Circle circleB) {
+    private static Collision detect(Body bodyA, Body bodyB, Circle circleA, Circle circleB) {
         double penetration_depth = Math.pow(circleA.getRadius() + circleB.getRadius(), 2)
                 - bodyA.position.squareOfDistance(bodyB.position);
         if (penetration_depth > 0) {
@@ -27,7 +29,7 @@ public class CollisionResolver {
         return null;
     }
 
-    private static Collision resolve(Body bodyA, Body bodyB, Polygon polygonA, Polygon polygonB) {
+    private static Collision detect(Body bodyA, Body bodyB, Polygon polygonA, Polygon polygonB) {
         LeastPenetration leastPenetrationReferenceA = findLeastPenetrationPolygon(bodyA, bodyB);
         if (leastPenetrationReferenceA.separation > 0) {
             return null;
@@ -38,38 +40,48 @@ public class CollisionResolver {
         }
 
         Side referenceSide;
-        double penetration;
         Body referenceBody, incidentBody;
-        Polygon referencePolygon, incidentPolygon;
         // separation is a negative value
         if (leastPenetrationReferenceA.separation > leastPenetrationReferenceB.separation) {
             referenceBody = bodyA;
             incidentBody = bodyB;
             referenceSide = bodyA.toWorldCoordinates(leastPenetrationReferenceA.referenceSide);
-            penetration = leastPenetrationReferenceA.getPenetration();
         } else {
             referenceBody = bodyB;
             incidentBody = bodyA;
             referenceSide = bodyB.toWorldCoordinates(leastPenetrationReferenceB.referenceSide);
-            penetration = leastPenetrationReferenceB.getPenetration();
         }
-        referencePolygon = (Polygon) referenceBody.getShape();
-        incidentPolygon = (Polygon) incidentBody.getShape();
 
-        Vector collisionNormal = referenceBody.toWorldCoordinates(referenceSide).getNormal();
+        Vector collisionNormal = referenceSide.getNormal();
 
+        Side incidentSide = incidentBody.toWorldCoordinates(findIncidentSide(referenceSide, incidentBody));
 
+        // clip the incident side to the range of reference side
+        incidentSide = clip(incidentSide, referenceSide.getA(), referenceSide.getDirection().reverse());
+        incidentSide = clip(incidentSide, referenceSide.getB(), referenceSide.getDirection());
 
+        ArrayList<Vector> contactPoints = new ArrayList<>();
+        double penetration = 0;
+        double separation = collisionNormal.dotProduct(incidentSide.getA().subtract(referenceSide.getA()));
+        if (separation < 0) {
+            contactPoints.add(incidentSide.getA());
+            penetration -= separation;
+        }
 
+        separation = collisionNormal.dotProduct(incidentSide.getA().subtract(referenceSide.getA()));
+        if (separation < 0) {
+            contactPoints.add(incidentSide.getB());
+            penetration -= separation;
+        }
 
+        Collision collision = new Collision(referenceBody, incidentBody,
+                collisionNormal, penetration / contactPoints.size());
+        collision.addContactPoints(contactPoints);
 
-
-
-
-
+        return collision;
     }
 
-    private static Collision resolve(Body bodyCircle, Body bodyPolygon, Circle circle, Polygon polygon) {
+    private static Collision detect(Body bodyCircle, Body bodyPolygon, Circle circle, Polygon polygon) {
         LeastPenetration leastPenetration = findLeastPenetrationCircle(bodyPolygon, bodyCircle);
         double separation = leastPenetration.separation;
         double radius = circle.getRadius();
@@ -121,8 +133,8 @@ public class CollisionResolver {
         return collision;
     }
 
-    private static Collision resolve(Body bodyPolygon, Body bodyCircle, Polygon polygon, Circle circle) {
-        return resolve(bodyCircle, bodyPolygon, circle, polygon);
+    private static Collision detect(Body bodyPolygon, Body bodyCircle, Polygon polygon, Circle circle) {
+        return detect(bodyCircle, bodyPolygon, circle, polygon);
     }
 
     /**
@@ -213,12 +225,11 @@ public class CollisionResolver {
      * which is the side whose normal has the most negative dot product
      * with the normal of the reference side
      * (smallest angle between incident side and reference side)
-     * @param referenceSide reference side in reference body coordinates
+     * @param referenceSide reference side in world coordinates
      * @return incident side which is in incident body coordinates
      */
-    private static Side findIncidentSide(Side referenceSide, Body referenceBody, Body incidentBody) {
+    private static Side findIncidentSide(Side referenceSide, Body incidentBody) {
         Polygon incidentPolygon = (Polygon) incidentBody.getShape();
-        referenceSide = referenceBody.toWorldCoordinates(referenceSide);
         Vector referenceSideNormal = referenceSide.getNormal();
 
         double smallestDotProductOfNormals = Double.MAX_VALUE;
