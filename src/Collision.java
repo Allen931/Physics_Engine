@@ -2,6 +2,8 @@ import java.util.ArrayList;
 
 public class Collision {
     Body bodyA, bodyB;
+    // in world coordinates
+    // body A points to body B
     Vector collisionNormal;
     double penetrationDepth;
     double coefficientOfRestitution;
@@ -14,7 +16,8 @@ public class Collision {
         bodyB = B;
         this.collisionNormal = collisionNormal.toUnitVector();
         this.penetrationDepth = penetrationDepth;
-        coefficientOfRestitution = Math.min(A.coefficientOfRestitution, B.coefficientOfRestitution);
+        coefficientOfRestitution = Math.min(A.getMaterial().getCoefficientOfRestitution(),
+                B.getMaterial().getCoefficientOfRestitution());
     }
 
     public void addContactPoint(Vector contactPoint) {

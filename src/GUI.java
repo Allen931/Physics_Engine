@@ -28,8 +28,8 @@ public class GUI extends JFrame {
             setBackground(Color.white);
             timer = new Timer(20, this);
             timer.start();
-            Body A = Body.createCircle(200, 100, 20, 20, 1);
-            Body B = Body.createCircle(600, 100, 20, 20, 1);
+            Body A = Body.createCircle(200, 100, 20, Material.STANDARD);
+            Body B = Body.createCircle(600, 100, 20, Material.STANDARD);
             A.setVelocity(new Vector(50, 0));
             B.setVelocity(new Vector(-50, 0));
             A.setAcceleration(new Vector(0, 9.8));

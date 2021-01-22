@@ -46,6 +46,10 @@ public class Body {
         return shape;
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+
     /**
      * rotate the body
      * @param angle in radian

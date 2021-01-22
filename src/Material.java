@@ -12,7 +12,7 @@ public class Material {
         this.dynamicFrictionCoefficient = dynamicFrictionCoefficient;
     }
 
-    public static Material STANDARD = new Material(1, 1, 0, 0);
+    public static final Material STANDARD = new Material(1, 1, 0, 0);
 
     public double getDensity() {
         return density;
