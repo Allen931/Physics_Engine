@@ -51,20 +51,20 @@ public class GUI extends JFrame {
 
             Vector[] vertices3 = new Vector[]{new Vector(10, -10), new Vector(10, 10),
                     new Vector(-10, 10), new Vector(-10, -10)};
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 5; j++) {
-                    Body polygon = Body.createPolygon(60 * j + 300, 40 * i, vertices3, Material.STANDARD);
-                    polygon.setVelocity(new Vector(50, 0));
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    Body polygon = Body.createPolygon(60 * j + 100, 40 * i, vertices3, Material.STANDARD);
+                    polygon.setVelocity(new Vector(50, 200));
                     polygon.setAcceleration(new Vector(0, 200));
                     polygon.angularVelocity = 20;
                     solver.add(polygon);
                 }
             }
 
-            for (int p = 0; p < 5; p++) {
-                for (int q = 0; q < 5; q++) {
-                    Body circle = Body.createCircle(60 * p + 320, 40 * q + 20, 10, Material.STANDARD);
-                    circle.setVelocity(new Vector(-50, 0));
+            for (int p = 0; p < 10; p++) {
+                for (int q = 0; q < 10; q++) {
+                    Body circle = Body.createCircle(60 * p + 120, 40 * q + 20, 10, Material.STANDARD);
+                    circle.setVelocity(new Vector(-50, 200));
                     circle.setAcceleration(new Vector(0, 200));
                     circle.angularVelocity = 0;
                     solver.add(circle);

@@ -7,21 +7,32 @@ import java.util.List;
  */
 public class Solver {
     private final ArrayList<Body> bodies;
-    private final double dt = 0.001;
+    private final LinkedList<Collision> collisions;
+    private final ArrayList<Body> collisionParallelToY;
+
+    private static final double dt = 0.001;
+    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 50.0;
+    private static final double SLEEPING_ANGULAR_VELOCITY_THRESHOLD = 0.02;
+    private static final double INELASTIC_VELOCITY_THRESHOLD = 5;
+
+    private final boolean enableSleeping = true;
 
     public Solver() {
         bodies = new ArrayList<>();
+        collisions = new LinkedList<>();
+        collisionParallelToY = new ArrayList<>();
     }
 
     public void update() {
         handleCollisions();
-        updatePositions();
         updateVelocities();
+        updatePositions();
+        removeDeadBodies();
     }
 
     private void updatePositions() {
         for (Body body : bodies) {
-            if (body.isAlive) {
+            if (!isSleep(body)) {
                 body.updatePosition(dt);
             }
         }
@@ -29,32 +40,41 @@ public class Solver {
 
     private void updateVelocities() {
         for (Body body : bodies) {
-            if (body.isAlive) {
-                body.updateVelocity(dt);
-            }
+            body.updateVelocity(dt);
         }
     }
 
-    public void handleCollisions() {
-        LinkedList<Collision> collisions = new LinkedList<>();
+    private void removeDeadBodies() {
+        bodies.removeIf(body -> !body.isAlive || body.position.getY() < -100);
+    }
+
+    private void handleCollisions() {
+        collisionParallelToY.clear();
         for (int i = 0; i < bodies.size(); i++) {
             Body bodyA = bodies.get(i);
-            if (bodyA.isAlive) {
-                for (int j = i + 1; j < bodies.size(); j++) {
-                    Body bodyB = bodies.get(j);
-                    if (bodyB.isAlive) {
-                        Collision collision = CollisionDetector.detect(bodyA, bodyB);
-                        if (collision != null) {
-                            collisions.add(collision);
-                        }
+            for (int j = i + 1; j < bodies.size(); j++) {
+                Body bodyB = bodies.get(j);
+                if (bodyA.mass == 0 && bodyB.mass == 0) {
+                    continue;
+                }
+
+                Collision collision = CollisionDetector.detect(bodyA, bodyB);
+                if (collision != null) {
+                    collisions.add(collision);
+                    if (Math.abs(Math.abs(collision.collisionNormal.getY()) - 1.0) < 0.001) {
+                        collisionParallelToY.add(bodyA);
+                        collisionParallelToY.add(bodyB);
                     }
                 }
             }
         }
 
+        LinkedList<Collision> toBeRemoved = new LinkedList<>();
         for (Collision collision : collisions) {
             handleCollision(collision);
+            toBeRemoved.add(collision);
         }
+        collisions.removeAll(toBeRemoved);
     }
 
     private void handleCollision(Collision collision) {
@@ -80,14 +100,15 @@ public class Solver {
                 return;
             }
 
-            // TODO
             double sumOfInverseMass = A.inverseMass + B.inverseMass
                     + Math.pow(contactVectorA.crossProduct2D(collisionNormal), 2) * A.inverseMomentOfInertia
                     + Math.pow(contactVectorB.crossProduct2D(collisionNormal), 2) * B.inverseMomentOfInertia;
 
-            // TODO
+            double coefficientOfRestitution
+                    = -velocityAlongNormal < INELASTIC_VELOCITY_THRESHOLD ? 0 : collision.coefficientOfRestitution;
+
             // Calculate impulse magnitude
-            double impulseMagnitude = -(1 + collision.coefficientOfRestitution)
+            double impulseMagnitude = -(1 + coefficientOfRestitution)
                     * velocityAlongNormal / sumOfInverseMass / collision.contactPoints.size();
 
             // Apply impulse
@@ -102,7 +123,7 @@ public class Solver {
                     + B.getMaterial().getDynamicFrictionCoefficient()) / 2;
 
             Vector directionOfFriction =
-                    relativeVelocity.subtract(collisionNormal.multiply(velocityAlongNormal)).reverse();
+                    relativeVelocity.subtract(collisionNormal.multiply(velocityAlongNormal)).reverse().toUnitVector();
             double frictionImpulseMagnitude = relativeVelocity.dotProduct(directionOfFriction)
                     / sumOfInverseMass / collision.contactPoints.size();
 
@@ -116,17 +137,19 @@ public class Solver {
             A.applyImpulse(frictionImpulse.reverse(), contactVectorA);
             B.applyImpulse(frictionImpulse, contactVectorB);
 
-            positionalCorrection(A, B, collision);
+            positionCorrection(A, B, collision);
 
             System.out.println("Relative velocity: " + relativeVelocity);
             System.out.println("Normal: " + collisionNormal);
+            System.out.println("Friction Impulse: " + frictionImpulse);
             System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);
             System.out.println("B : Position: " + B.position + " " + "Velocity: " + B.velocity);
+            System.out.println("A: Angular Velocity " + A.angularVelocity + " " + "B: Angular Velocity " + B.angularVelocity);
         }
     }
 
     // prevent one body sinking into another
-    private void positionalCorrection(Body A, Body B, Collision collision) {
+    private void positionCorrection(Body A, Body B, Collision collision) {
         double percent = 0.2;
         double slop = 0.01;
         Vector correction = collision.collisionNormal.multiply(percent)
@@ -136,9 +159,9 @@ public class Solver {
         B.setPosition(B.position.add(correction.multiply(B.inverseMass)));
     }
 
-    //Todo
-    private boolean isResting(Body body) {
-        return false;
+    private boolean isSleep(Body body) {
+        return enableSleeping && body.velocity.lengthSquare() < SLEEPING_VELOCITY_THRESHOLD_SQUARE &&
+                body.angularVelocity < SLEEPING_ANGULAR_VELOCITY_THRESHOLD && collisionParallelToY.contains(body);
     }
 
     public void add(Body body) {
