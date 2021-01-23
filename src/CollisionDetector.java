@@ -16,13 +16,13 @@ public class CollisionDetector {
     }
 
     private static Collision detect(Body bodyA, Body bodyB, Circle circleA, Circle circleB) {
-        double penetration_depth = Math.pow(circleA.getRadius() + circleB.getRadius(), 2)
-                - bodyA.position.squareOfDistance(bodyB.position);
-        if (penetration_depth > 0) {
-            Vector normal = bodyB.position.subtract(bodyA.position);
-            penetration_depth = Math.sqrt(penetration_depth);
-            Collision collision = new Collision(bodyA, bodyB, normal, penetration_depth);
-            Vector contactPoint = bodyA.toWorldCoordinates(normal.multiply(circleA.getRadius()));
+        double penetrationDepthSquare = Math.pow(circleA.getRadius() + circleB.getRadius(), 2)
+                - bodyB.position.squareOfDistance(bodyA.position);
+        if (penetrationDepthSquare > 0) {
+            Vector normal = bodyB.position.subtract(bodyA.position).toUnitVector();
+            double penetrationDepth = Math.sqrt(penetrationDepthSquare);
+            Collision collision = new Collision(bodyA, bodyB, normal, penetrationDepth);
+            Vector contactPoint = normal.multiply(circleA.getRadius()).add(bodyA.position);
             collision.addContactPoint(contactPoint);
             return collision;
         }
@@ -68,7 +68,7 @@ public class CollisionDetector {
             penetration -= separation;
         }
 
-        separation = collisionNormal.dotProduct(incidentSide.getA().subtract(referenceSide.getA()));
+        separation = collisionNormal.dotProduct(incidentSide.getB().subtract(referenceSide.getB()));
         if (separation < 0) {
             contactPoints.add(incidentSide.getB());
             penetration -= separation;
@@ -141,7 +141,7 @@ public class CollisionDetector {
      * Get the farthest point from the side
      * @param incidentBody incident polygon
      * @param direction should be in world coordinates
-     * @return the farthest point
+     * @return the farthest point in world coordinates
      */
     public static Vector getSupportPoint(Body incidentBody, Vector direction) {
         Polygon incidentPolygon = (Polygon) incidentBody.getShape();

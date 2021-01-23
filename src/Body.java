@@ -1,6 +1,9 @@
+import java.util.ArrayList;
+
 import static java.lang.Math.PI;
 
 public class Body {
+    AABB aabb;
     Vector velocity = new Vector(0, 0);
     Vector acceleration = new Vector(0, 0);
     Vector position;
@@ -16,22 +19,34 @@ public class Body {
     double inverseMomentOfInertia;
     Matrix rotationMatrix;
 
+    boolean isAlive = true;
+
     public Body(Vector position, Shape shape, Material material) {
         this.position = position;
         this.shape = shape;
         this.material = material;
         this.mass = material.getDensity() * shape.getArea();
         inverseMass = mass == 0 ? 0 : 1 / mass;
-        setOrientation(0);
+        setOrientation(0.0);
+        calculateAABB();
         angularVelocity = 0;
         momentOfInertia = shape.getMomentOfInertiaFactor() * material.getDensity();
         inverseMomentOfInertia = momentOfInertia == 0 ? 0 : 1 / momentOfInertia;
+    }
+
+    private void calculateAABB() {
+        if (shape instanceof Circle) {
+            aabb = new AABB(position, ((Circle) shape).getRadius());
+        } else if (shape instanceof Polygon) {
+            aabb = new AABB(this, ((Polygon) shape).getVertices());
+        }
     }
 
     public void updatePosition(double dt) {
         if (mass != 0) {
             position = position.add(velocity.multiply(dt));
             setOrientation(orientation + angularVelocity * dt);
+            calculateAABB();
         }
     }
 
@@ -56,8 +71,9 @@ public class Body {
     }
 
     public void applyImpulse(Vector impulse, Vector contactVector) {
-        velocity = velocity.multiply(inverseMass);
+        velocity = velocity.add(impulse.multiply(inverseMass));
         angularVelocity += contactVector.crossProduct2D(impulse) * inverseMomentOfInertia;
+        System.out.println(shape.toString() + "\n" + angularVelocity);
     }
 
     public Shape getShape() {
@@ -92,7 +108,7 @@ public class Body {
     }
 
     public Vector toBodyCoordinates(Vector vector) {
-        return rotationMatrix.transpose().transform(vector).subtract(position);
+        return rotationMatrix.transpose().transform(vector.subtract(position));
     }
 
     public Side toBodyCoordinates(Side side) {
@@ -101,7 +117,7 @@ public class Body {
 
     public Vector toUICoordinates(Vector vector) {
         // round orientation to nearest integer in degree
-        Matrix uiRotationMatrix = new Matrix(Math.round(orientation / PI * 180) / 180 * PI);
+        Matrix uiRotationMatrix = new Matrix(Math.toRadians(Math.round(Math.toDegrees(orientation))));
         return uiRotationMatrix.transform(vector).add(position);
     }
 
