@@ -1,4 +1,6 @@
-public class Circle implements Shape{
+import java.io.Serializable;
+
+public class Circle implements Shape, Serializable {
     private final double radius;
 
     public Circle(double r) {

@@ -1,4 +1,6 @@
-public class Material {
+import java.io.Serializable;
+
+public class Material implements Serializable {
     private final double density;
     private final double coefficientOfRestitution;
     private final double staticFrictionCoefficient;
@@ -13,9 +15,15 @@ public class Material {
     }
 
     public static final Material STANDARD =
-            new Material(1, 1, 0.05, 0.045);
+            new Material(1, 1, 0.05, 0.04);
     public static final Material STATIC =
-            new Material(0, 0.5, 0.05, 0.045);
+            new Material(0, 0.5, 0.4, 0.3);
+    public static final Material WOOD =
+            new Material(3, 0.7, 0.6, 0.4);
+    public static final Material BIRD =
+            new Material(5, 0.4, 0.6, 0.4);
+    public static final Material PIG =
+            new Material(5, 0.4, 0.5, 0.3);
 
     public double getDensity() {
         return density;

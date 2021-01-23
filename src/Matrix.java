@@ -1,6 +1,8 @@
 import org.junit.experimental.max.MaxCore;
 
-public class Matrix {
+import java.io.Serializable;
+
+public class Matrix implements Serializable {
     private final Vector columnVector0, columnVector1;
 
     public Matrix(double m00, double m01, double m10, double m11) {

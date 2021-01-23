@@ -1,10 +1,17 @@
-public class Vector implements Comparable<Vector> {
+import java.io.Serializable;
+
+public class Vector implements Comparable<Vector>, Serializable {
     private final double x;
     private final double y;
 
     public Vector(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vector(Vector vector) {
+        x = vector.x;
+        y = vector.y;
     }
 
     public double squareOfDistance(Vector target) {

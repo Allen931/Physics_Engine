@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Collision {
+public class Collision implements Serializable {
     Body bodyA, bodyB;
     // in world coordinates
     // body A points to body B

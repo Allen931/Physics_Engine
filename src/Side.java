@@ -1,13 +1,14 @@
-public class Side {
+import java.io.Serializable;
+
+public class Side implements Serializable {
     private final Vector A;
     private final Vector B;
-    private final Vector normal;
+    private Vector normal = null;
 
     // Side AB
     public Side(Vector A, Vector B) {
         this.A = A;
         this.B = B;
-        this.normal = B.subtract(A).unitNormalVector();
     }
 
     public Vector toVectorForm() {
@@ -19,6 +20,9 @@ public class Side {
     }
 
     public Vector getNormal() {
+        if (normal == null) {
+            normal = B.subtract(A).unitNormalVector();
+        }
         return normal;
     }
 
@@ -40,7 +44,7 @@ public class Side {
      */
     public double distanceToSide(Vector target) {
         Vector vertexToTarget = target.subtract(A);
-        return vertexToTarget.dotProduct(normal);
+        return vertexToTarget.dotProduct(getNormal());
     }
 
     public Side changeA(Vector changedA) {

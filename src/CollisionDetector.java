@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class CollisionDetector {
+public class CollisionDetector implements Serializable {
 
     public static Collision detect(Body A, Body B) {
         if (A.getShape() instanceof Circle && B.getShape() instanceof Circle) {
@@ -31,11 +32,11 @@ public class CollisionDetector {
 
     private static Collision detect(Body bodyA, Body bodyB, Polygon polygonA, Polygon polygonB) {
         LeastPenetration leastPenetrationReferenceA = findLeastPenetrationPolygon(bodyA, bodyB);
-        if (leastPenetrationReferenceA.separation > 0) {
+        if (leastPenetrationReferenceA == null) {
             return null;
         }
         LeastPenetration leastPenetrationReferenceB = findLeastPenetrationPolygon(bodyB, bodyA);
-        if (leastPenetrationReferenceB.separation > 0) {
+        if (leastPenetrationReferenceB == null) {
             return null;
         }
 
@@ -83,11 +84,11 @@ public class CollisionDetector {
 
     private static Collision detect(Body bodyCircle, Body bodyPolygon, Circle circle, Polygon polygon) {
         LeastPenetration leastPenetration = findLeastPenetrationCircle(bodyPolygon, bodyCircle);
-        double separation = leastPenetration.separation;
-        double radius = circle.getRadius();
-        if (separation > radius) {
+        if (leastPenetration == null) {
             return null;
         }
+        double separation = leastPenetration.separation;
+        double radius = circle.getRadius();
 
         Side referenceSide = bodyPolygon.toWorldCoordinates(leastPenetration.referenceSide);
         Vector center = bodyCircle.position;
@@ -173,11 +174,15 @@ public class CollisionDetector {
         double bestSeparation = -Double.MAX_VALUE;
         Side referenceSide = null;
         for (Side side : sides) {
+            Side referenceSideInWorld = referencePolygon.toWorldCoordinates(side);
             Vector supportPoint = getSupportPoint(incidentPolygon,
-                    referencePolygon.toWorldCoordinates(side).getNormal().reverse());
-            double separation = referencePolygon.toWorldCoordinates(side).distanceToSide(supportPoint);
+                    referenceSideInWorld.getNormal().reverse());
+            double separation = referenceSideInWorld.distanceToSide(supportPoint);
 
             if (separation > bestSeparation) {
+                if (separation > 0) {
+                    return null;
+                }
                 bestSeparation = separation;
                 referenceSide = side;
             }
@@ -188,6 +193,7 @@ public class CollisionDetector {
     public static LeastPenetration findLeastPenetrationCircle(Body referencePolygon, Body incidentCircle) {
         Side[] sides = ((Polygon) referencePolygon.getShape()).getSides();
         Vector center = referencePolygon.toBodyCoordinates(incidentCircle.position);
+        double radius = ((Circle) incidentCircle.getShape()).getRadius();
 
         double bestSeparation = -Double.MAX_VALUE;
         Side referenceSide = null;
@@ -196,6 +202,9 @@ public class CollisionDetector {
             double separation = side.distanceToSide(center);
 
             if (separation > bestSeparation) {
+                if (separation > radius) {
+                    return null;
+                }
                 bestSeparation = separation;
                 referenceSide = side;
             }
@@ -203,7 +212,7 @@ public class CollisionDetector {
         return new LeastPenetration(referenceSide, bestSeparation);
     }
 
-    public static class LeastPenetration {
+    public static class LeastPenetration implements Serializable {
         // in body coordinates
         Side referenceSide;
         // penetration = -separation

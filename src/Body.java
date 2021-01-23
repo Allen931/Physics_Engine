@@ -1,8 +1,7 @@
-import java.util.ArrayList;
+import java.awt.*;
+import java.io.Serializable;
 
-import static java.lang.Math.PI;
-
-public class Body {
+public class Body implements Serializable {
     AABB aabb;
     Vector velocity = new Vector(0, 0);
     Vector acceleration = new Vector(0, 0);
@@ -19,8 +18,6 @@ public class Body {
     double inverseMomentOfInertia;
     Matrix rotationMatrix;
 
-    boolean isAlive = true;
-
     public Body(Vector position, Shape shape, Material material) {
         this.position = position;
         this.shape = shape;
@@ -32,6 +29,10 @@ public class Body {
         angularVelocity = 0;
         momentOfInertia = shape.getMomentOfInertiaFactor() * material.getDensity();
         inverseMomentOfInertia = momentOfInertia == 0 ? 0 : 1 / momentOfInertia;
+    }
+
+    public boolean isAlive() {
+        return true;
     }
 
     private void calculateAABB() {
@@ -59,11 +60,15 @@ public class Body {
     }
 
     public void setVelocity(Vector velocity) {
-        this.velocity = velocity;
+        if (mass != 0) {
+            this.velocity = velocity;
+        }
     }
 
     public void setAcceleration(Vector acceleration) {
-        this.acceleration = acceleration;
+        if (mass != 0) {
+            this.acceleration = acceleration;
+        }
     }
 
     public void resetAcceleration() {
@@ -73,7 +78,9 @@ public class Body {
     public void applyImpulse(Vector impulse, Vector contactVector) {
         velocity = velocity.add(impulse.multiply(inverseMass));
         angularVelocity += contactVector.crossProduct2D(impulse) * inverseMomentOfInertia;
-        System.out.println(shape.toString() + "\n" + angularVelocity);
+        if (this instanceof Pig) {
+            ((Pig) this).loseHP(impulse);
+        }
     }
 
     public Shape getShape() {
@@ -86,7 +93,6 @@ public class Body {
 
     /**
      * rotate the body
-     *
      * @param angle in radian
      */
     public void rotate(double angle) {
@@ -121,12 +127,37 @@ public class Body {
         return uiRotationMatrix.transform(vector).add(position);
     }
 
+
+
+}
+
+class BodyFactory {
     public static Body createCircle(double x, double y, double radius, Material material) {
         return new Body(new Vector(x, y), new Circle(radius), material);
     }
 
     public static Body createPolygon(double x, double y, Vector[] vertices, Material material) {
         return new Body(new Vector(x, y), new Polygon(vertices), material);
+    }
+
+    public static Body createRectangle(double x, double y, double width, double height, Material material) {
+        Vector[] vertices = new Vector[]{new Vector(width / 2.0, -height / 2.0),
+                new Vector(width / 2.0, height / 2.0),
+                new Vector(-width / 2.0, height / 2.0),
+                new Vector(-width / 2.0, -height / 2.0)};
+        return createPolygon(x, y, vertices, material);
+    }
+
+    public static Body createSquare(double x, double y, double length, Material material) {
+        return createRectangle(x, y, length, length, material);
+    }
+
+    public static Bird createBird(Vector position, Image image, double radius) {
+        return new Bird(position, image, radius);
+    }
+
+    public static Pig createPig(double x, double y, Image image, double radius) {
+        return new Pig(new Vector(x, y), image, radius);
     }
 
 }

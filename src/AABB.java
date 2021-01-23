@@ -1,6 +1,9 @@
-import java.util.ArrayList;
+import java.io.Serializable;
 
-public class AABB {
+/**
+ * for broad stage collision detection
+ */
+public class AABB implements Serializable {
     Vector min;
     Vector max;
 
@@ -39,7 +42,8 @@ public class AABB {
     }
 
     public boolean possibleToCollide(AABB aabb) {
-        return max.getX() >= aabb.min.getX() || aabb.max.getX() >= min.getX();
+        return (max.getX() >= aabb.min.getX() || aabb.max.getX() >= min.getX());
+//                && (max.getY() >= aabb.min.getY() || aabb.max.getY() >= min.getY());
     }
 
 }

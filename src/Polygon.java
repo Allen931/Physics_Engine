@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Polygon implements Shape {
+public class Polygon implements Shape, Serializable {
     private final Vector[] vertices;
     private final Side[] sides;
     private double area;
