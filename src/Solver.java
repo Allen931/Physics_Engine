@@ -1,5 +1,6 @@
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,22 +10,22 @@ import java.util.List;
 public class Solver implements Serializable {
     private final ArrayList<Body> bodies;
     private final LinkedList<Collision> collisions;
-    private final ArrayList<Body> collisionParallelToY;
+    private final HashSet<Body> collisionParallelToY;
 
     private static final double dt = 0.001;
-    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 50.0;
-    private static final double SLEEPING_ANGULAR_VELOCITY_THRESHOLD = 0.25;
+    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 200.0;
+    private static final double SLEEPING_ANGULAR_VELOCITY_THRESHOLD = 0.5;
     private static final double INELASTIC_VELOCITY_THRESHOLD = 5;
 
     public static final Vector ZERO = new Vector(0, 0);
-    public static final Vector GRAVITY = new Vector(0, 300);
+    public static final Vector GRAVITY = new Vector(0, 600);
 
     private final boolean enableSleeping = true;
 
     public Solver() {
         bodies = new ArrayList<>();
         collisions = new LinkedList<>();
-        collisionParallelToY = new ArrayList<>();
+        collisionParallelToY = new HashSet<>();
     }
 
     public void update() {
@@ -152,6 +153,7 @@ public class Solver implements Serializable {
 
             positionCorrection(A, B, collision);
 
+            //for debug
 //            System.out.println("Impulse: " + impulse);
 //            System.out.println("Relative velocity: " + relativeVelocity);
 //            System.out.println("Normal: " + collisionNormal);
@@ -164,7 +166,7 @@ public class Solver implements Serializable {
 
     // prevent one body sinking into another
     private void positionCorrection(Body A, Body B, Collision collision) {
-        double factor = 0.15;
+        double factor = 0.2;
         double allowance = 0.03;
         Vector correction = collision.collisionNormal.multiply(factor)
                 .multiply(Math.max(collision.penetrationDepth - allowance, 0))

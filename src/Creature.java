@@ -42,15 +42,22 @@ class Pig extends Creature {
 
     public Pig(Vector position) {
         super(position, new Circle(imageIcon.getIconWidth() / 2.0), Material.PIG, imageIcon);
-        healthPoint = 2000000;
+        healthPoint = 3000000;
     }
 
     public void loseHP(Vector impulse) {
         double damage = impulse.length();
         System.out.println(damage);
-        if (damage > 50000) {
+        if (damage > 100000) {
             healthPoint -= damage;
         }
     }
 
+}
+
+class RoughPig extends Pig {
+    public RoughPig(Vector position) {
+        super(position);
+        material = Material.ROUGH_PIG;
+    }
 }

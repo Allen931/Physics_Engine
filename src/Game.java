@@ -10,7 +10,7 @@ public class Game extends JFrame implements Serializable {
     public static final int GROUND_LEVEL = 470;
     String fileName = "game.txt";
     JPanel currentPanel;
-    ArrayList<Stage> stages = new ArrayList<>();
+    ArrayList<Stage> stages = null;
     int currentStageIndex = 0;
 
     public Game() {
@@ -19,8 +19,6 @@ public class Game extends JFrame implements Serializable {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         currentPanel = new BeginningPanel();
         getContentPane().add(currentPanel);
-        stages.add(StageMaker.makeStage1());
-        stages.add(StageMaker.makeStage2());
         setLocationRelativeTo(null);
         setVisible(true);
         setResizable(false);
@@ -69,6 +67,13 @@ public class Game extends JFrame implements Serializable {
 
     private void startNewGame() {
         hint();
+        stages = new ArrayList<>();
+//        stages.add(StageMaker.makeTestStage());
+        stages.add(StageMaker.makeStage1());
+        stages.add(StageMaker.makeStage2());
+        stages.add(StageMaker.makeStage3());
+        stages.add(StageMaker.makeStage4());
+        stages.add(StageMaker.makeStage5());
         currentStageIndex = 0;
         currentPanel = new GamePanel(stages.get(currentStageIndex));
         getContentPane().removeAll();
@@ -78,17 +83,18 @@ public class Game extends JFrame implements Serializable {
     }
 
     private void nextStage() {
-        saveGame();
         currentStageIndex += 1;
         if (currentStageIndex == stages.size()) {
             endingMessage();
             quitGame();
         }
+        currentPanel.setVisible(false);
         currentPanel = new GamePanel(stages.get(currentStageIndex));
         getContentPane().removeAll();
         getContentPane().add(currentPanel);
         setVisible(true);
         setResizable(false);
+        saveGame();
     }
 
     private void loadGame() {
@@ -163,16 +169,16 @@ public class Game extends JFrame implements Serializable {
     }
 
     public class GamePanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener, Serializable {
-        Solver solver = new Solver();
-        Timer timer;
-        Timer victoryTimer = null;
-        final Vector initialBirdPosition = new Vector(125, 350);
-        Vector mousePosition = null;
-        boolean isDragging = false;
+        public Solver solver = new Solver();
+        public Timer timer;
+        public Timer victoryTimer = null;
+        public final Vector initialBirdPosition = new Vector(125, 350);
+        public Vector mousePosition = null;
+        public boolean isDragging = false;
 
-        ArrayList<Bird> birds = new ArrayList<>();
-        ArrayList<Pig> pigs = new ArrayList<>();
-        int numberOfBirds = 0;
+        public ArrayList<Bird> birds = new ArrayList<>();
+        public ArrayList<Pig> pigs = new ArrayList<>();
+        public int numberOfBirds = 0;
 
         public GamePanel(Stage stage) {
             setBackground(Color.WHITE);
@@ -231,6 +237,7 @@ public class Game extends JFrame implements Serializable {
                     victoryTimer.addActionListener(e1 -> {
                         victoryTimer.stop();
                         winMessage();
+                        setVisible(false);
                         nextStage();
                     });
                     victoryTimer.setRepeats(false);
@@ -317,8 +324,8 @@ public class Game extends JFrame implements Serializable {
                 Vector birdDragged = initialBirdPosition.subtract(mousePosition);
                 double draggedDistanceSquare = birdDragged.lengthSquare();
 
-                if (draggedDistanceSquare >= 90 * 90) {
-                    birdDragged = birdDragged.toUnitVector().multiply(90);
+                if (draggedDistanceSquare >= 100 * 100) {
+                    birdDragged = birdDragged.toUnitVector().multiply(100);
                 }
 
                 birdPosition = initialBirdPosition.subtract(birdDragged);
@@ -337,11 +344,13 @@ public class Game extends JFrame implements Serializable {
                         break;
                     }
 
-                    graphics.setColor(Color.DARK_GRAY);
-                    graphics.fillOval(x - 3, y - 3, 6, 6);
+                    graphics.setColor(Color.PINK);
+                    int size = (int) Math.round(7 - time * 0.6);
+                    graphics.fillOval((int) Math.round(x - size / 2.0), (int) Math.round(y - size / 2.0), size, size);
                 }
             }
 
+            graphics.setColor(Color.BLACK);
             Bird bird = BodyFactory.createBird(birdPosition);
             drawCreature(graphics, bird);
 
@@ -369,6 +378,7 @@ public class Game extends JFrame implements Serializable {
             if (key == KeyEvent.VK_Q || key == KeyEvent.VK_ESCAPE) {
                 timer.stop();
                 saveGame();
+                setVisible(true);
                 toBeginningPanel();
             }
         }
@@ -398,8 +408,8 @@ public class Game extends JFrame implements Serializable {
                 Vector birdDragged = initialBirdPosition.subtract(mousePosition);
                 double draggedDistanceSquare = birdDragged.lengthSquare();
 
-                if (draggedDistanceSquare >= 90 * 90) {
-                    birdDragged = birdDragged.toUnitVector().multiply(90);
+                if (draggedDistanceSquare >= 100 * 100) {
+                    birdDragged = birdDragged.toUnitVector().multiply(100);
                 }
 
                 Vector birdPosition = initialBirdPosition.subtract(birdDragged);

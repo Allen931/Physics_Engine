@@ -8,7 +8,7 @@ public class Body implements Serializable {
     Vector acceleration = new Vector(0, 0);
     Vector position;
     private final Shape shape;
-    private final Material material;
+    Material material;
     double mass;
     double inverseMass;
 
@@ -169,4 +169,7 @@ class BodyFactory {
         return new Pig(new Vector(x, y));
     }
 
+    public static RoughPig createRoughPig(double x, double y) {
+        return new RoughPig(new Vector(x, y));
+    }
 }
