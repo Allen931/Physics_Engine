@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 
@@ -32,7 +33,7 @@ public class Body implements Serializable {
     }
 
     public boolean isAlive() {
-        return true;
+        return (position.getY() < 500) || (mass == 0);
     }
 
     private void calculateAABB() {
@@ -69,6 +70,10 @@ public class Body implements Serializable {
         if (mass != 0) {
             this.acceleration = acceleration;
         }
+    }
+
+    public void setAngularVelocity(double angularVelocity) {
+        this.angularVelocity = angularVelocity;
     }
 
     public void resetAcceleration() {
@@ -152,12 +157,16 @@ class BodyFactory {
         return createRectangle(x, y, length, length, material);
     }
 
-    public static Bird createBird(Vector position, Image image, double radius) {
-        return new Bird(position, image, radius);
+    public static Bird createBird(double x, double y) {
+        return new Bird(new Vector(x, y));
     }
 
-    public static Pig createPig(double x, double y, Image image, double radius) {
-        return new Pig(new Vector(x, y), image, radius);
+    public static Bird createBird(Vector position) {
+        return new Bird(position);
+    }
+
+    public static Pig createPig(double x, double y) {
+        return new Pig(new Vector(x, y));
     }
 
 }

@@ -16,8 +16,8 @@ public class Solver implements Serializable {
     private static final double SLEEPING_ANGULAR_VELOCITY_THRESHOLD = 0.25;
     private static final double INELASTIC_VELOCITY_THRESHOLD = 5;
 
-    private static final Vector ZERO = new Vector(0, 0);
-    private static final Vector GRAVITY = new Vector(0, 300);
+    public static final Vector ZERO = new Vector(0, 0);
+    public static final Vector GRAVITY = new Vector(0, 300);
 
     private final boolean enableSleeping = true;
 
@@ -55,7 +55,7 @@ public class Solver implements Serializable {
     }
 
     private void removeDeadBodies() {
-        bodies.removeIf(body -> !body.isAlive() || body.position.getY() < -100);
+        bodies.removeIf(body -> !body.isAlive());
     }
 
     private void solveCollisions() {
@@ -152,13 +152,13 @@ public class Solver implements Serializable {
 
             positionCorrection(A, B, collision);
 
-            System.out.println("Impulse: " + impulse);
-            System.out.println("Relative velocity: " + relativeVelocity);
-            System.out.println("Normal: " + collisionNormal);
-            System.out.println("Friction Impulse: " + frictionImpulse);
-            System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);
-            System.out.println("B : Position: " + B.position + " " + "Velocity: " + B.velocity);
-            System.out.println("A: Angular Velocity " + A.angularVelocity + " " + "B: Angular Velocity " + B.angularVelocity);
+//            System.out.println("Impulse: " + impulse);
+//            System.out.println("Relative velocity: " + relativeVelocity);
+//            System.out.println("Normal: " + collisionNormal);
+//            System.out.println("Friction Impulse: " + frictionImpulse);
+//            System.out.println("A : Position: " + A.position + " " + "Velocity: " + A.velocity);
+//            System.out.println("B : Position: " + B.position + " " + "Velocity: " + B.velocity);
+//            System.out.println("A: Angular Velocity " + A.angularVelocity + " " + "B: Angular Velocity " + B.angularVelocity);
         }
     }
 
@@ -191,5 +191,12 @@ public class Solver implements Serializable {
 
     public ArrayList<Body> getBodies() {
         return bodies;
+    }
+
+    public void resetSolver(Stage stage) {
+        this.bodies.clear();
+        collisions.clear();
+        collisionParallelToY.clear();
+        addAll(stage.bodies);
     }
 }

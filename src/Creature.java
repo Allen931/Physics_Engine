@@ -1,54 +1,56 @@
-import java.awt.*;
-import java.util.Timer;
-import java.util.TimerTask;
+import javax.swing.*;
 
 public class Creature extends Body {
-    Image image;
+    ImageIcon imageIcon;
     double healthPoint;
 
-    public Creature(Vector position, Shape shape, Material material, Image image) {
+    public Creature(Vector position, Shape shape, Material material, ImageIcon imageIcon) {
         super(position, shape, material);
-        this.image = image;
+        this.imageIcon = imageIcon;
     }
 
     @Override
     public boolean isAlive() {
+        if (position.getY() > 500) {
+            return false;
+        }
         return healthPoint > 0;
     }
-
 }
 
 class Bird extends Creature {
-    Timer timer;
+    public static String filename = "bird.jpg";
+    public static ImageIcon imageIcon = new ImageIcon(filename);
 
-    public Bird(Vector position, Image image, double radius) {
-        super(position, new Circle(radius), Material.BIRD, image);
+    public Bird(Vector position) {
+        super(position, new Circle(imageIcon.getIconWidth() / 2.0), Material.BIRD, imageIcon);
         healthPoint = 5000;
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                healthPoint = 0;
-            }
-        }, 15000);
     }
 
     public void loseHP(boolean isSleeping) {
         if (isSleeping) {
             healthPoint -= 1;
+        } else {
+            healthPoint = 5000;
         }
     }
 }
 
 class Pig extends Creature {
+    public static String filename = "pig.png";
+    public static ImageIcon imageIcon = new ImageIcon(filename);
 
-    public Pig(Vector position, Image image, double radius) {
-        super(position, new Circle(radius), Material.PIG, image);
-        healthPoint = Math.pow(100000, 2);
+    public Pig(Vector position) {
+        super(position, new Circle(imageIcon.getIconWidth() / 2.0), Material.PIG, imageIcon);
+        healthPoint = 2000000;
     }
 
     public void loseHP(Vector impulse) {
-        healthPoint -= impulse.lengthSquare();
+        double damage = impulse.length();
+        System.out.println(damage);
+        if (damage > 50000) {
+            healthPoint -= damage;
+        }
     }
 
 }

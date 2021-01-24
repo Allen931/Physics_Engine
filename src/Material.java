@@ -24,6 +24,10 @@ public class Material implements Serializable {
             new Material(5, 0.4, 0.6, 0.4);
     public static final Material PIG =
             new Material(5, 0.4, 0.5, 0.3);
+    public static final Material IGNORE =
+            new Material(0, 1, 0, 0);
+    public static final Material STEEL =
+            new Material(10, 0.8, 0.2, 0.1);
 
     public double getDensity() {
         return density;

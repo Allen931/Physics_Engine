@@ -43,7 +43,6 @@ public class AABB implements Serializable {
 
     public boolean possibleToCollide(AABB aabb) {
         return (max.getX() >= aabb.min.getX() || aabb.max.getX() >= min.getX());
-//                && (max.getY() >= aabb.min.getY() || aabb.max.getY() >= min.getY());
     }
 
 }

@@ -14,6 +14,11 @@ public class Vector implements Comparable<Vector>, Serializable {
         y = vector.y;
     }
 
+    public Vector(double angle) {
+        x = Math.cos(angle);
+        y = Math.sin(angle);
+    }
+
     public double squareOfDistance(Vector target) {
         return Math.pow(x - target.x, 2) + Math.pow(y - target.y, 2);
     }
@@ -47,8 +52,8 @@ public class Vector implements Comparable<Vector>, Serializable {
     }
 
     public Vector toUnitVector() {
-        double length = length();
-        return new Vector(x / length, y / length);
+        double angle = Math.atan2(y, x);
+        return new Vector(angle);
     }
 
     public double getX() {
