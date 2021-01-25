@@ -11,6 +11,7 @@ public class Body implements Serializable {
     Material material;
     double mass;
     double inverseMass;
+    double healthPoint;
 
     // angle in radian
     double orientation;
@@ -30,10 +31,11 @@ public class Body implements Serializable {
         angularVelocity = 0;
         momentOfInertia = shape.getMomentOfInertiaFactor() * material.getDensity();
         inverseMomentOfInertia = momentOfInertia == 0 ? 0 : 1 / momentOfInertia;
+        healthPoint = 2500 * mass;
     }
 
     public boolean isAlive() {
-        return (position.getY() < 500) || (mass == 0);
+        return (healthPoint > 0 && position.getY() < 500) || (mass == 0);
     }
 
     private void calculateAABB() {
@@ -83,8 +85,16 @@ public class Body implements Serializable {
     public void applyImpulse(Vector impulse, Vector contactVector) {
         velocity = velocity.add(impulse.multiply(inverseMass));
         angularVelocity += contactVector.crossProduct2D(impulse) * inverseMomentOfInertia;
-        if (this instanceof Pig) {
-            ((Pig) this).loseHP(impulse);
+        if (!(this instanceof Bird)) {
+            this.loseHP(impulse);
+        }
+    }
+
+    public void loseHP(Vector impulse) {
+        double damage = impulse.length();
+//        System.out.println(damage);
+        if (damage > 100000) {
+            healthPoint -= damage;
         }
     }
 

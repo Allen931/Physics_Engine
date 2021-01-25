@@ -6,30 +6,32 @@ import java.awt.geom.Ellipse2D;
 import java.io.*;
 import java.util.ArrayList;
 
-public class Game extends JFrame implements Serializable {
+public class Game extends JFrame {
+    public static Game instance = new Game();
+
     public static final int GROUND_LEVEL = 470;
     String fileName = "game.txt";
-    JPanel currentPanel;
-    ArrayList<Stage> stages = null;
-    int currentStageIndex = 0;
 
-    public Game() {
+    GameState gameState;
+
+    private Game() {
         setSize(800, 500);
         setTitle("HAngry Birds");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        currentPanel = new BeginningPanel();
-        getContentPane().add(currentPanel);
+        gameState = new GameState();
+    }
+
+    private void changePanel(JPanel newPanel) {
+        getContentPane().removeAll();
+        getContentPane().add(newPanel);
         setLocationRelativeTo(null);
         setVisible(true);
         setResizable(false);
     }
 
-    private void toBeginningPanel() {
-        currentPanel = new BeginningPanel();
-        getContentPane().removeAll();
-        getContentPane().add(currentPanel);
-        setVisible(true);
-        setResizable(false);
+
+    public void toBeginningPanel() {
+        changePanel(new BeginningPanel());
     }
 
     private void toGamePanel(String request) {
@@ -67,51 +69,44 @@ public class Game extends JFrame implements Serializable {
 
     private void startNewGame() {
         hint();
-        stages = new ArrayList<>();
+        gameState.stages = new ArrayList<>();
 //        stages.add(StageMaker.makeTestStage());
-        stages.add(StageMaker.makeStage1());
-        stages.add(StageMaker.makeStage2());
-        stages.add(StageMaker.makeStage3());
-        stages.add(StageMaker.makeStage4());
-        stages.add(StageMaker.makeStage5());
-        currentStageIndex = 0;
-        currentPanel = new GamePanel(stages.get(currentStageIndex));
-        getContentPane().removeAll();
-        getContentPane().add(currentPanel);
-        setVisible(true);
-        setResizable(false);
+        gameState.stages.add(StageMaker.makeStage1());
+        gameState.stages.add(StageMaker.makeStage2());
+        gameState.stages.add(StageMaker.makeStage3());
+        gameState.stages.add(StageMaker.makeStage4());
+        gameState.stages.add(StageMaker.makeStage5());
+        gameState.currentStageIndex = 0;
+        GamePanel newPanel = new GamePanel(true);
+        changePanel(newPanel);
+        newPanel.timer.start();
     }
 
     private void nextStage() {
-        currentStageIndex += 1;
-        if (currentStageIndex == stages.size()) {
+        gameState.currentStageIndex += 1;
+        if (gameState.currentStageIndex == gameState.stages.size()) {
             endingMessage();
             quitGame();
         }
-        currentPanel.setVisible(false);
-        currentPanel = new GamePanel(stages.get(currentStageIndex));
-        getContentPane().removeAll();
-        getContentPane().add(currentPanel);
-        setVisible(true);
-        setResizable(false);
+
+        GamePanel newPanel = new GamePanel(true);
+        changePanel(newPanel);
         saveGame();
+        newPanel.timer.start();
     }
 
     private void loadGame() {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(fileName));
-            Game savedGame = (Game) inputStream.readObject();
+            gameState = (GameState) inputStream.readObject();
             inputStream.close();
 
             hint();
 
-            currentPanel = savedGame.currentPanel;
-            getContentPane().removeAll();
-            getContentPane().add(currentPanel);
-            setVisible(true);
-            setResizable(false);
-            ((GamePanel) currentPanel).timer.start();
-        } catch (FileNotFoundException e) {
+            GamePanel newPanel = new GamePanel(false);
+            changePanel(newPanel);
+            newPanel.timer.start();
+        } catch (EOFException | FileNotFoundException e) {
             warning();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -122,7 +117,7 @@ public class Game extends JFrame implements Serializable {
         ObjectOutputStream outputStream;
         try {
             outputStream = new ObjectOutputStream(new FileOutputStream(fileName));
-            outputStream.writeObject(this);
+            outputStream.writeObject(gameState);
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -160,7 +155,6 @@ public class Game extends JFrame implements Serializable {
             add(quit);
         }
 
-
         @Override
         public void actionPerformed(ActionEvent e) {
             String request = ((JButton) e.getSource()).getText();
@@ -168,36 +162,42 @@ public class Game extends JFrame implements Serializable {
         }
     }
 
-    public class GamePanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener, Serializable {
-        public Solver solver = new Solver();
-        public Timer timer;
-        public Timer victoryTimer = null;
+    public class GamePanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
+
         public final Vector initialBirdPosition = new Vector(125, 350);
-        public Vector mousePosition = null;
-        public boolean isDragging = false;
+        Timer timer;
+        Timer victoryTimer = null;
 
-        public ArrayList<Bird> birds = new ArrayList<>();
-        public ArrayList<Pig> pigs = new ArrayList<>();
-        public int numberOfBirds = 0;
+        boolean isDragging = false;
+        Vector mousePosition = null;
 
-        public GamePanel(Stage stage) {
+        public GamePanel(boolean isNewGame) {
             setBackground(Color.WHITE);
 
-            solver.resetSolver(stage);
-            for (Body body : solver.getBodies()) {
-                if (body instanceof Pig) {
-                    pigs.add((Pig) body);
-                }
+            timer = new Timer(16, this);
+
+            if (isNewGame) {
+                constructNewGame();
             }
-            setGround();
 
             setFocusable(true);
             addKeyListener(this);
             addMouseListener(this);
             addMouseMotionListener(this);
+        }
 
-            timer = new Timer(16, this);
-            timer.start();
+        private void constructNewGame() {
+            gameState.birds = new ArrayList<>();
+            gameState.pigs = new ArrayList<>();
+            gameState.numberOfBirds = 0;
+
+            gameState.solver.resetSolver(gameState.stages.get(gameState.currentStageIndex));
+            for (Body body : gameState.solver.getBodies()) {
+                if (body instanceof Pig) {
+                    gameState.pigs.add((Pig) body);
+                }
+            }
+            setGround();
         }
 
         @Override
@@ -212,25 +212,25 @@ public class Game extends JFrame implements Serializable {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == timer) {
                 requestFocusInWindow();
-                for (int i = 0; i < 16; i++) {
-                    solver.update();
+                for (int i = 0; i < 32; i++) {
+                    gameState.solver.update();
                 }
 
                 ArrayList<Bird> birdsToBeRemoved = new ArrayList<>();
-                for (Bird bird : birds) {
+                for (Bird bird : gameState.birds) {
                     if (!bird.isAlive()) {
                         birdsToBeRemoved.add(bird);
                     }
                 }
-                birds.removeAll(birdsToBeRemoved);
+                gameState.birds.removeAll(birdsToBeRemoved);
 
                 ArrayList<Pig> pigsToBeRemoved = new ArrayList<>();
-                for (Pig pig: pigs) {
+                for (Pig pig: gameState.pigs) {
                     if (!pig.isAlive()) {
                         pigsToBeRemoved.add(pig);
                     }
                 }
-                pigs.removeAll(pigsToBeRemoved);
+                gameState.pigs.removeAll(pigsToBeRemoved);
 
                 if (checkVictory() && victoryTimer == null) {
                     victoryTimer = new Timer(2000, this);
@@ -250,21 +250,21 @@ public class Game extends JFrame implements Serializable {
 
         private void winMessage() {
             String message;
-            if (numberOfBirds == 1) {
+            if (gameState.numberOfBirds == 1) {
                 message = "Clear Stage With ONE Bird!";
             } else {
-                message = "Clear Stage!\n(" + numberOfBirds + " birds used in Stage "+
-                        (currentStageIndex + 1) +")\n" + "The game will be saved automatically.";
+                message = "Clear Stage!\n(" + gameState.numberOfBirds + " birds used in Stage "+
+                        (gameState.currentStageIndex + 1) +")\n" + "The game will be saved automatically.";
             }
             JOptionPane.showMessageDialog(null, message, "CLEAR", JOptionPane.INFORMATION_MESSAGE);
         }
 
         private boolean checkVictory() {
-            return pigs.size() == 0;
+            return gameState.pigs.size() == 0;
         }
 
         private void drawBodies(Graphics graphics) {
-            for (Body body : solver.getBodies()) {
+            for (Body body : gameState.solver.getBodies()) {
                 if (body instanceof Creature) {
                     drawCreature(graphics, (Creature) body);
                 } else if (body.getShape() instanceof Circle) {
@@ -332,10 +332,11 @@ public class Game extends JFrame implements Serializable {
 
                 Vector speed = birdDragged.multiply(10);
 
+                graphics.setColor(Color.PINK);
                 graphics.drawLine((int) birdPosition.getX(), (int) birdPosition.getY(),
                         (int) initialBirdPosition.getX(), (int) initialBirdPosition.getY());
 
-                for (double time = 0; time < 10; time += 0.05) {
+                for (double time = 0; time < 6; time += 0.01) {
                     int x = (int) (birdPosition.getX() + speed.getX() * time);
                     int y = (int) (birdPosition.getY() + speed.getY() * time
                             + Solver.GRAVITY.getY() * time * time / 2.0);
@@ -344,8 +345,7 @@ public class Game extends JFrame implements Serializable {
                         break;
                     }
 
-                    graphics.setColor(Color.PINK);
-                    int size = (int) Math.round(7 - time * 0.6);
+                    int size = (int) Math.round(5 - time * 0.5);
                     graphics.fillOval((int) Math.round(x - size / 2.0), (int) Math.round(y - size / 2.0), size, size);
                 }
             }
@@ -364,7 +364,7 @@ public class Game extends JFrame implements Serializable {
             Vector[] vertices = {new Vector(-400, -30), new Vector(400, -30),
                     new Vector(-400, 100), new Vector(400, 100)};
             Body ground = BodyFactory.createPolygon(400, 500, vertices, Material.STATIC);
-            solver.add(ground);
+            gameState.solver.add(ground);
         }
 
         @Override
@@ -378,7 +378,6 @@ public class Game extends JFrame implements Serializable {
             if (key == KeyEvent.VK_Q || key == KeyEvent.VK_ESCAPE) {
                 timer.stop();
                 saveGame();
-                setVisible(true);
                 toBeginningPanel();
             }
         }
@@ -404,7 +403,7 @@ public class Game extends JFrame implements Serializable {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (isDragging && birds.size() < 5) {
+            if (isDragging && gameState.birds.size() < 5) {
                 Vector birdDragged = initialBirdPosition.subtract(mousePosition);
                 double draggedDistanceSquare = birdDragged.lengthSquare();
 
@@ -416,9 +415,9 @@ public class Game extends JFrame implements Serializable {
 
                 Bird bird = BodyFactory.createBird(birdPosition);
                 bird.setVelocity(birdDragged.multiply(10));
-                birds.add(bird);
-                solver.add(bird);
-                numberOfBirds += 1;
+                gameState.birds.add(bird);
+                gameState.solver.add(bird);
+                gameState.numberOfBirds += 1;
             }
             isDragging = false;
         }

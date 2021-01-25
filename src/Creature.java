@@ -47,7 +47,7 @@ class Pig extends Creature {
 
     public void loseHP(Vector impulse) {
         double damage = impulse.length();
-        System.out.println(damage);
+//        System.out.println(damage);
         if (damage > 100000) {
             healthPoint -= damage;
         }

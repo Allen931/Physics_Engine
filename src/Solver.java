@@ -12,8 +12,8 @@ public class Solver implements Serializable {
     private final LinkedList<Collision> collisions;
     private final HashSet<Body> collisionParallelToY;
 
-    private static final double dt = 0.001;
-    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 200.0;
+    private static final double dt = 0.0005;
+    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 400.0;
     private static final double SLEEPING_ANGULAR_VELOCITY_THRESHOLD = 0.5;
     private static final double INELASTIC_VELOCITY_THRESHOLD = 5;
 
