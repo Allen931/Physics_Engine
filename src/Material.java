@@ -19,7 +19,7 @@ public class Material implements Serializable {
     public static final Material STATIC =
             new Material(0, 0.5, 0.4, 0.3);
     public static final Material WOOD =
-            new Material(6, 0.7, 0.6, 0.5);
+            new Material(6, 0.5, 0.6, 0.5);
     public static final Material BIRD =
             new Material(10, 0.4, 0.6, 0.4);
     public static final Material PIG =
@@ -30,12 +30,14 @@ public class Material implements Serializable {
             new Material(0, 1, 0, 0);
     public static final Material STEEL =
             new Material(10, 0.8, 0.2, 0.1);
+    public static final Material SUPER_STEEL =
+            new Material(50, 1, 0, 0);
     public static final Material LIGHT_WEIGHT_WOOD =
             new Material(4, 0.5, 0.6, 0.5);
     public static final Material LIGHT_ROUGH_WOOD =
             new Material(4, 0.5, 1.5, 1.5);
     public static final Material HEAVY_WOOD =
-            new Material(8, 0.5, 0.4, 0.3);
+            new Material(8, 0.4, 0.4, 0.3);
 
 
     public double getDensity() {

@@ -19,16 +19,15 @@ public class Game extends JFrame {
         setTitle("HAngry Birds");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         gameState = new GameState();
+        setLocationRelativeTo(null);
     }
 
     private void changePanel(JPanel newPanel) {
         getContentPane().removeAll();
         getContentPane().add(newPanel);
-        setLocationRelativeTo(null);
         setVisible(true);
         setResizable(false);
     }
-
 
     public void toBeginningPanel() {
         changePanel(new BeginningPanel());
@@ -69,14 +68,7 @@ public class Game extends JFrame {
 
     private void startNewGame() {
         hint();
-        gameState.stages = new ArrayList<>();
-//        stages.add(StageMaker.makeTestStage());
-        gameState.stages.add(StageMaker.makeStage1());
-        gameState.stages.add(StageMaker.makeStage2());
-        gameState.stages.add(StageMaker.makeStage3());
-        gameState.stages.add(StageMaker.makeStage4());
-        gameState.stages.add(StageMaker.makeStage5());
-        gameState.currentStageIndex = 0;
+        setStages();
         GamePanel newPanel = new GamePanel(true);
         changePanel(newPanel);
         newPanel.timer.start();
@@ -84,15 +76,27 @@ public class Game extends JFrame {
 
     private void nextStage() {
         gameState.currentStageIndex += 1;
-        if (gameState.currentStageIndex == gameState.stages.size()) {
+        if (gameState.currentStageIndex >= gameState.stages.size()) {
             endingMessage();
-            quitGame();
+            setStages();
+            toBeginningPanel();
+            return;
         }
 
         GamePanel newPanel = new GamePanel(true);
         changePanel(newPanel);
         saveGame();
         newPanel.timer.start();
+    }
+
+    private void setStages() {
+        gameState.stages = new ArrayList<>();
+        gameState.currentStageIndex = 0;
+        gameState.stages.add(StageMaker.makeStage1());
+        gameState.stages.add(StageMaker.makeStage2());
+        gameState.stages.add(StageMaker.makeStage3());
+        gameState.stages.add(StageMaker.makeStage4());
+        gameState.stages.add(StageMaker.makeStage5());
     }
 
     private void loadGame() {
@@ -163,13 +167,15 @@ public class Game extends JFrame {
     }
 
     public class GamePanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
-
-        public final Vector initialBirdPosition = new Vector(125, 350);
+        private final Vector initialBirdPosition = new Vector(125, 350);
         Timer timer;
         Timer victoryTimer = null;
 
         boolean isDragging = false;
         Vector mousePosition = null;
+        Vector birdPosition = null;
+        Vector birdDragged = Solver.ZERO;
+        Vector birdSpeed = Solver.ZERO;
 
         public GamePanel(boolean isNewGame) {
             setBackground(Color.WHITE);
@@ -236,6 +242,7 @@ public class Game extends JFrame {
                     victoryTimer = new Timer(2000, this);
                     victoryTimer.addActionListener(e1 -> {
                         victoryTimer.stop();
+                        timer.stop();
                         winMessage();
                         setVisible(false);
                         nextStage();
@@ -317,28 +324,21 @@ public class Game extends JFrame {
         }
 
         private void drawBird(Graphics graphics) {
-            Vector birdPosition;
+
             if (!isDragging) {
                 birdPosition = initialBirdPosition;
             } else {
-                Vector birdDragged = initialBirdPosition.subtract(mousePosition);
-                double draggedDistanceSquare = birdDragged.lengthSquare();
-
-                if (draggedDistanceSquare >= 100 * 100) {
-                    birdDragged = birdDragged.toUnitVector().multiply(100);
-                }
-
-                birdPosition = initialBirdPosition.subtract(birdDragged);
-
-                Vector speed = birdDragged.multiply(10);
+//                Graphics2D graphics2D = (Graphics2D) graphics;
+//                graphics2D.setStroke(new BasicStroke(3));
+//                graphics2D.setColor(Color.PINK);
+//                graphics2D.drawLine((int) birdPosition.getX(), (int) birdPosition.getY(),
+//                        (int) initialBirdPosition.getX(), (int) initialBirdPosition.getY());
+//                graphics2D.setStroke(new BasicStroke(1));
 
                 graphics.setColor(Color.PINK);
-                graphics.drawLine((int) birdPosition.getX(), (int) birdPosition.getY(),
-                        (int) initialBirdPosition.getX(), (int) initialBirdPosition.getY());
-
                 for (double time = 0; time < 6; time += 0.01) {
-                    int x = (int) (birdPosition.getX() + speed.getX() * time);
-                    int y = (int) (birdPosition.getY() + speed.getY() * time
+                    int x = (int) (birdPosition.getX() + birdSpeed.getX() * time);
+                    int y = (int) (birdPosition.getY() + birdSpeed.getY() * time
                             + Solver.GRAVITY.getY() * time * time / 2.0);
 
                     if (x < 0 || x > 800) {
@@ -404,17 +404,8 @@ public class Game extends JFrame {
         @Override
         public void mouseReleased(MouseEvent e) {
             if (isDragging && gameState.birds.size() < 5) {
-                Vector birdDragged = initialBirdPosition.subtract(mousePosition);
-                double draggedDistanceSquare = birdDragged.lengthSquare();
-
-                if (draggedDistanceSquare >= 100 * 100) {
-                    birdDragged = birdDragged.toUnitVector().multiply(100);
-                }
-
-                Vector birdPosition = initialBirdPosition.subtract(birdDragged);
-
                 Bird bird = BodyFactory.createBird(birdPosition);
-                bird.setVelocity(birdDragged.multiply(10));
+                bird.setVelocity(birdSpeed);
                 gameState.birds.add(bird);
                 gameState.solver.add(bird);
                 gameState.numberOfBirds += 1;
@@ -436,6 +427,15 @@ public class Game extends JFrame {
         public void mouseDragged(MouseEvent e) {
             if (isDragging) {
                 mousePosition = new Vector(e.getX(), e.getY());
+                birdDragged = initialBirdPosition.subtract(mousePosition);
+                double draggedDistanceSquare = birdDragged.lengthSquare();
+
+                if (draggedDistanceSquare >= 100 * 100) {
+                    birdDragged = birdDragged.toUnitVector().multiply(100);
+                }
+
+                birdPosition = initialBirdPosition.subtract(birdDragged);
+                birdSpeed = birdDragged.multiply(10);
             }
         }
 

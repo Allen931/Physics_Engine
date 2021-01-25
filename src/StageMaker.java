@@ -41,17 +41,17 @@ public class StageMaker implements Serializable {
     public static Stage makeStage2() {
         ArrayList<Body> bodies = new ArrayList<>();
 
-        Body polygon1 = BodyFactory.createRectangle(300, 400, 30, 200, Material.WOOD);
-        Body polygon2 = BodyFactory.createRectangle(500, 400, 30, 200, Material.WOOD);
-        Body polygon3 = BodyFactory.createRectangle(400, 285, 230, 30, Material.STEEL);
-        Body polygon4 = BodyFactory.createRectangle(400, 170, 30, 200, Material.WOOD);
+        Body polygon1 = BodyFactory.createRectangle(300, 370, 30, 200, Material.WOOD);
+        Body polygon2 = BodyFactory.createRectangle(500, 370, 30, 200, Material.WOOD);
+        Body polygon3 = BodyFactory.createRectangle(400, 255, 230, 30, Material.STEEL);
+        Body polygon4 = BodyFactory.createRectangle(400, 140, 30, 200, Material.WOOD);
         bodies.add(polygon1);
         bodies.add(polygon2);
         bodies.add(polygon3);
         bodies.add(polygon4);
 
         Pig pig1 = BodyFactory.createPig(400, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
-        Pig pig2 = BodyFactory.createPig(400, 270 - Pig.imageIcon.getIconHeight() / 2.0);
+        Pig pig2 = BodyFactory.createPig(360, 240 - Pig.imageIcon.getIconHeight() / 2.0);
         Pig pig3 = BodyFactory.createPig(750, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
         bodies.add(pig1);
         bodies.add(pig2);
@@ -67,22 +67,22 @@ public class StageMaker implements Serializable {
         Body polygon2 = BodyFactory.createRectangle(650, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon3 = BodyFactory.createRectangle(740, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
 
-        Body polygon4 = BodyFactory.createRectangle(600, 390, 100, 20, Material.LIGHT_WEIGHT_WOOD);
-        Body polygon5 = BodyFactory.createRectangle(700, 390, 100, 20, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon4 = BodyFactory.createRectangle(600, 390, 100, 20, Material.WOOD);
+        Body polygon5 = BodyFactory.createRectangle(700, 390, 100, 20, Material.WOOD);
 
         Body polygon6 = BodyFactory.createRectangle(560, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon7 = BodyFactory.createRectangle(650, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon8 = BodyFactory.createRectangle(740, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
 
-        Body polygon9 = BodyFactory.createRectangle(600, 300, 100, 20, Material.LIGHT_WEIGHT_WOOD);
-        Body polygon10 = BodyFactory.createRectangle(700, 300, 100, 20, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon9 = BodyFactory.createRectangle(600, 300, 100, 20, Material.WOOD);
+        Body polygon10 = BodyFactory.createRectangle(700, 300, 100, 20, Material.WOOD);
 
         Body polygon11 = BodyFactory.createRectangle(560, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon12 = BodyFactory.createRectangle(650, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon13 = BodyFactory.createRectangle(740, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
 
-        Body polygon14 = BodyFactory.createRectangle(600, 210, 100, 20, Material.LIGHT_WEIGHT_WOOD);
-        Body polygon15 = BodyFactory.createRectangle(700, 210, 100, 20, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon14 = BodyFactory.createRectangle(600, 210, 100, 20, Material.WOOD);
+        Body polygon15 = BodyFactory.createRectangle(700, 210, 100, 20, Material.WOOD);
 
         Pig pig1 = BodyFactory.createPig(605, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
         Pig pig2 = BodyFactory.createPig(695, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
@@ -133,22 +133,22 @@ public class StageMaker implements Serializable {
         Body polygon3 = BodyFactory.createRectangle(650, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon4 = BodyFactory.createRectangle(740, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
 
-        Body polygon5 = BodyFactory.createRectangle(600, 390, 100, 20, Material.LIGHT_WEIGHT_WOOD);
-        Body polygon6 = BodyFactory.createRectangle(700, 390, 100, 20, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon5 = BodyFactory.createRectangle(600, 390, 100, 20, Material.WOOD);
+        Body polygon6 = BodyFactory.createRectangle(700, 390, 100, 20, Material.WOOD);
 
         Body polygon7 = BodyFactory.createRectangle(560, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon8 = BodyFactory.createRectangle(650, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon9 = BodyFactory.createRectangle(740, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
 
-        Body polygon10 = BodyFactory.createRectangle(600, 300, 100, 20, Material.LIGHT_WEIGHT_WOOD);
-        Body polygon11 = BodyFactory.createRectangle(700, 300, 100, 20, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon10 = BodyFactory.createRectangle(600, 300, 100, 20, Material.WOOD);
+        Body polygon11 = BodyFactory.createRectangle(700, 300, 100, 20, Material.WOOD);
 
         Body polygon12 = BodyFactory.createRectangle(560, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon13 = BodyFactory.createRectangle(650, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
         Body polygon14 = BodyFactory.createRectangle(740, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
 
-        Body polygon15 = BodyFactory.createRectangle(600, 210, 100, 20, Material.LIGHT_WEIGHT_WOOD);
-        Body polygon16 = BodyFactory.createRectangle(700, 210, 100, 20, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon15 = BodyFactory.createRectangle(600, 210, 100, 20, Material.WOOD);
+        Body polygon16 = BodyFactory.createRectangle(700, 210, 100, 20, Material.WOOD);
 
         Pig pig1 = BodyFactory.createPig(605, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
         Pig pig2 = BodyFactory.createPig(695, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
@@ -190,6 +190,86 @@ public class StageMaker implements Serializable {
     }
 
     public static Stage makeStage5() {
+        ArrayList<Body> bodies = new ArrayList<>();
+
+        Body polygon1 = BodyFactory.createRectangle(300, 420, 30, 100, Material.WOOD);
+        Body polygon2 = BodyFactory.createRectangle(500, 420, 30, 100, Material.WOOD);
+        Body polygon3 = BodyFactory.createRectangle(400, 355, 230, 30, Material.STEEL);
+//        Body polygon4 = BodyFactory.createRectangle(400, 290, 30, 100, Material.WOOD);
+
+
+        Pig pig1 = BodyFactory.createPig(400, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
+//        Pig pig2 = BodyFactory.createPig(400, 240 - Pig.imageIcon.getIconHeight() / 2.0);
+
+
+        Body polygon5 = BodyFactory.createRectangle(560, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon6 = BodyFactory.createRectangle(650, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon7 = BodyFactory.createRectangle(740, 435, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+
+        Body polygon8 = BodyFactory.createRectangle(600, 390, 100, 20, Material.WOOD);
+        Body polygon9 = BodyFactory.createRectangle(700, 390, 100, 20, Material.WOOD);
+
+        Body polygon10 = BodyFactory.createRectangle(560, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon11 = BodyFactory.createRectangle(650, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon12 = BodyFactory.createRectangle(740, 345, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+
+        Body polygon13 = BodyFactory.createRectangle(600, 300, 100, 20, Material.WOOD);
+        Body polygon14 = BodyFactory.createRectangle(700, 300, 100, 20, Material.WOOD);
+
+        Body polygon15 = BodyFactory.createRectangle(560, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon16 = BodyFactory.createRectangle(650, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+        Body polygon17 = BodyFactory.createRectangle(740, 255, 20, 70, Material.LIGHT_WEIGHT_WOOD);
+
+        Body polygon18 = BodyFactory.createRectangle(600, 210, 100, 20, Material.WOOD);
+        Body polygon19 = BodyFactory.createRectangle(700, 210, 100, 20, Material.WOOD);
+
+        Pig pig3 = BodyFactory.createPig(605, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
+        Pig pig4 = BodyFactory.createPig(695, Game.GROUND_LEVEL - Pig.imageIcon.getIconHeight() / 2.0);
+
+        Pig pig5 = BodyFactory.createPig(605, 380 - Pig.imageIcon.getIconHeight() / 2.0);
+        Pig pig6 = BodyFactory.createPig(695, 380 - Pig.imageIcon.getIconHeight() / 2.0);
+
+        Pig pig7 = BodyFactory.createPig(605, 290 - Pig.imageIcon.getIconHeight() / 2.0);
+        Pig pig8 = BodyFactory.createPig(695, 290 - Pig.imageIcon.getIconHeight() / 2.0);
+
+        Body ball = BodyFactory.createCircle(450, 310, 30, Material.SUPER_STEEL);
+
+        bodies.add(polygon1);
+        bodies.add(polygon2);
+        bodies.add(polygon3);
+//        bodies.add(polygon4);
+        bodies.add(polygon5);
+        bodies.add(polygon6);
+        bodies.add(polygon7);
+        bodies.add(polygon8);
+        bodies.add(polygon9);
+        bodies.add(polygon10);
+        bodies.add(polygon11);
+        bodies.add(polygon12);
+        bodies.add(polygon13);
+        bodies.add(polygon14);
+        bodies.add(polygon15);
+        bodies.add(polygon16);
+        bodies.add(polygon17);
+        bodies.add(polygon18);
+        bodies.add(polygon19);
+
+        bodies.add(pig1);
+//        bodies.add(pig2);
+        bodies.add(pig3);
+        bodies.add(pig4);
+        bodies.add(pig5);
+        bodies.add(pig6);
+        bodies.add(pig7);
+        bodies.add(pig8);
+
+        bodies.add(ball);
+
+        return new Stage(bodies);
+    }
+
+    public static Stage makeStage6() {
+        // failed design
         ArrayList<Body> bodies = new ArrayList<>();
 
         Body polygon1 = BodyFactory.createRectangle(415, 425, 20, 100, Material.WOOD);

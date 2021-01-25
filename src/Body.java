@@ -1,5 +1,3 @@
-import javax.swing.*;
-import java.awt.*;
 import java.io.Serializable;
 
 public class Body implements Serializable {
@@ -35,7 +33,7 @@ public class Body implements Serializable {
     }
 
     public boolean isAlive() {
-        return (healthPoint > 0 && position.getY() < 500) || (mass == 0);
+        return (healthPoint > 0 && position.getY() < 500) || mass == 0;
     }
 
     private void calculateAABB() {
@@ -92,7 +90,6 @@ public class Body implements Serializable {
 
     public void loseHP(Vector impulse) {
         double damage = impulse.length();
-//        System.out.println(damage);
         if (damage > 100000) {
             healthPoint -= damage;
         }

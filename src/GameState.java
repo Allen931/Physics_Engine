@@ -10,5 +10,4 @@ public class GameState implements Serializable {
     public ArrayList<Bird> birds;
     public ArrayList<Pig> pigs;
     public int numberOfBirds;
-
 }

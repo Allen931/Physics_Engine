@@ -13,12 +13,12 @@ public class Solver implements Serializable {
     private final HashSet<Body> collisionParallelToY;
 
     private static final double dt = 0.0005;
-    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 400.0;
+    private static final double SLEEPING_VELOCITY_THRESHOLD_SQUARE = 1000.0;
     private static final double SLEEPING_ANGULAR_VELOCITY_THRESHOLD = 0.5;
     private static final double INELASTIC_VELOCITY_THRESHOLD = 5;
 
+    public static final Vector GRAVITY = new Vector(0, 800);
     public static final Vector ZERO = new Vector(0, 0);
-    public static final Vector GRAVITY = new Vector(0, 600);
 
     private final boolean enableSleeping = true;
 
@@ -30,9 +30,9 @@ public class Solver implements Serializable {
 
     public void update() {
         solveCollisions();
+        removeDeadBodies();
         updateVelocities();
         updatePositions();
-        removeDeadBodies();
     }
 
     private void updatePositions() {
@@ -40,7 +40,7 @@ public class Solver implements Serializable {
             if (!isSleeping(body)) {
                 body.updatePosition(dt);
             } else {
-                body.setAcceleration(ZERO);
+                body.resetAcceleration();
                 if (body instanceof Bird) {
                     ((Bird) body).loseHP(isSleeping(body));
                 }
@@ -166,8 +166,8 @@ public class Solver implements Serializable {
 
     // prevent one body sinking into another
     private void positionCorrection(Body A, Body B, Collision collision) {
-        double factor = 0.2;
-        double allowance = 0.03;
+        double factor = 0.3;
+        double allowance = 0.05;
         Vector correction = collision.collisionNormal.multiply(factor)
                 .multiply(Math.max(collision.penetrationDepth - allowance, 0))
                 .multiply((1 / (A.inverseMass + B.inverseMass)));
