@@ -16,7 +16,7 @@ public class Game extends JFrame {
 
     private Game() {
         setSize(800, 500);
-        setTitle("HAngry Birds");
+        setTitle("Angry Birds");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         gameState = new GameState();
         setLocationRelativeTo(null);
